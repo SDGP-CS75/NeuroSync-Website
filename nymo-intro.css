@@ -1,0 +1,95 @@
+/* Nymo App Intro Section Styles */
+.app-intro-section {
+  width: 100vw;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 20% 10%, #3a2edb 0%, #b84a5a 100%);
+  border-radius: 2rem;
+  margin: 24px auto 40px auto;
+  box-shadow: 0 8px 48px rgba(30, 20, 60, 0.18);
+  position: relative;
+  overflow: hidden;
+}
+
+.app-intro-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px 56px 24px;
+  text-align: center;
+  color: #fff;
+}
+
+.app-logo {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 24px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 4px 32px rgba(80, 40, 120, 0.12);
+}
+
+.coming-soon-badge {
+  display: inline-block;
+  background: #a97fff;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 1rem;
+  padding: 4px 16px;
+  margin-bottom: 18px;
+  letter-spacing: 0.04em;
+}
+
+.app-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  background: linear-gradient(90deg, #cdbdff 30%, #ffb3c6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 24px;
+  color: #e0d6f7;
+}
+
+.app-features {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.feature-badge {
+  background: rgba(30, 20, 60, 0.22);
+  border-radius: 1.2rem;
+  padding: 6px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 700px) {
+  .app-intro-section {
+    min-height: 40vh;
+    border-radius: 1rem;
+    margin: 12px 0 24px 0;
+  }
+  .app-title {
+    font-size: 2.2rem;
+  }
+  .app-logo {
+    width: 80px;
+    height: 80px;
+  }
+}
