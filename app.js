@@ -5,6 +5,7 @@ const storySteps = [...document.querySelectorAll(".story-step")];
 const storyScreens = [...document.querySelectorAll(".screen-state")];
 const heroPhone = document.querySelector(".hero-phone");
 const storyPhone = document.querySelector(".story-device");
+const heroUi = document.querySelector(".hero-ui");
 const phoneScenes = document.querySelectorAll("[data-phone-scene]");
 const ctaForm = document.querySelector(".cta-form");
 const formStatus = document.getElementById("form-status");
@@ -26,7 +27,10 @@ const heroMotion = {
   targetRotateY: 12,
   twist: -6,
   targetTwist: -6,
-  hoverActive: false,
+  uiShiftX: 0,
+  targetUiShiftX: 0,
+  uiShiftY: 0,
+  targetUiShiftY: 0,
 };
 const storyMotion = {
   scale: 0.88,
@@ -47,12 +51,33 @@ function splitText(target) {
   const text = target.textContent.trim();
   target.textContent = "";
 
-  [...text].forEach((char, index) => {
-    const span = document.createElement("span");
-    span.className = char === " " ? "split-space" : "split-char";
-    span.textContent = char === " " ? "" : char;
-    span.style.transitionDelay = `${index * 22}ms`;
-    target.appendChild(span);
+  let globalIndex = 0;
+  const words = text.split(" ");
+
+  words.forEach((word, wordIndex) => {
+    const wordSpan = document.createElement("span");
+    wordSpan.className = "split-word";
+    wordSpan.style.display = "inline-block";
+    wordSpan.style.whiteSpace = "nowrap";
+
+    [...word].forEach((char) => {
+      const charSpan = document.createElement("span");
+      charSpan.className = "split-char";
+      charSpan.textContent = char;
+      charSpan.style.transitionDelay = `${globalIndex * 22}ms`;
+      wordSpan.appendChild(charSpan);
+      globalIndex++;
+    });
+
+    target.appendChild(wordSpan);
+
+    if (wordIndex < words.length - 1) {
+      const spaceSpan = document.createElement("span");
+      spaceSpan.className = "split-space";
+      spaceSpan.textContent = " ";
+      target.appendChild(spaceSpan);
+      globalIndex++;
+    }
   });
 }
 
@@ -121,12 +146,10 @@ function updateHeroPhone() {
   const rotateX = -8 + Math.min(progress, 1) * 10;
   const twist = -6 + Math.min(progress, 1) * 5;
 
-  if (!heroMotion.hoverActive) {
-    heroMotion.targetScale = scale;
-    heroMotion.targetRotateY = rotateY;
-    heroMotion.targetRotateX = rotateX;
-    heroMotion.targetTwist = twist;
-  }
+  heroMotion.targetScale = scale;
+  heroMotion.targetRotateY = rotateY;
+  heroMotion.targetRotateX = rotateX;
+  heroMotion.targetTwist = twist;
 }
 
 function applyScrollDirectionTilt() {
@@ -154,6 +177,13 @@ function renderPhoneMotion() {
     heroPhone.style.setProperty("--tilt-x", heroMotion.rotateX.toFixed(3));
     heroPhone.style.setProperty("--tilt-y", heroMotion.rotateY.toFixed(3));
     heroPhone.style.setProperty("--twist", heroMotion.twist.toFixed(3));
+
+    if (heroUi) {
+      heroMotion.uiShiftX = lerp(heroMotion.uiShiftX, heroMotion.targetUiShiftX, 0.12);
+      heroMotion.uiShiftY = lerp(heroMotion.uiShiftY, heroMotion.targetUiShiftY, 0.12);
+      heroUi.style.setProperty("--ui-shift-x", `${heroMotion.uiShiftX.toFixed(2)}px`);
+      heroUi.style.setProperty("--ui-shift-y", `${heroMotion.uiShiftY.toFixed(2)}px`);
+    }
   }
 
   if (storyPhone) {
@@ -179,11 +209,11 @@ function handlePointerTilt(scene) {
     const y = (event.clientY - rect.top) / rect.height - 0.5;
 
     if (phone.classList.contains("hero-phone")) {
-      heroMotion.hoverActive = true;
-      heroMotion.targetRotateY = x * 24;
-      heroMotion.targetRotateX = -y * 16 - 2;
-      heroMotion.targetTwist = x * 6;
-      heroMotion.targetScale = Math.max(heroMotion.targetScale, 0.8);
+      heroMotion.targetRotateY = x * 20;
+      heroMotion.targetRotateX = -y * 13;
+      heroMotion.targetTwist = x * 4;
+      heroMotion.targetUiShiftX = x * 18;
+      heroMotion.targetUiShiftY = y * 18;
     } else {
       storyMotion.targetRotateY = x * 12;
       storyMotion.targetRotateX = -y * 8;
@@ -192,7 +222,8 @@ function handlePointerTilt(scene) {
 
   scene.addEventListener("mouseleave", () => {
     if (phone.classList.contains("hero-phone")) {
-      heroMotion.hoverActive = false;
+      heroMotion.targetUiShiftX = 0;
+      heroMotion.targetUiShiftY = 0;
     }
     updateHeroPhone();
     updateStoryProgress();
