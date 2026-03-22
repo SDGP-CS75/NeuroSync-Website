@@ -285,6 +285,48 @@ ctaForm.addEventListener("submit", (event) => {
     : "Enter an email if you'd like to join the NeuroSync beta.";
 });
 
+// Mobile menu toggle functionality
+const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+const mobileNav = document.getElementById("mobileNav");
+const mobileNavLinks = mobileNav.querySelectorAll("a");
+
+function closeMobileMenu() {
+  mobileMenuToggle.classList.remove("active");
+  mobileNav.classList.remove("active");
+  mobileMenuToggle.setAttribute("aria-expanded", "false");
+}
+
+mobileMenuToggle.addEventListener("click", () => {
+  mobileMenuToggle.classList.toggle("active");
+  mobileNav.classList.toggle("active");
+  mobileMenuToggle.setAttribute(
+    "aria-expanded",
+    mobileMenuToggle.classList.contains("active")
+  );
+});
+
+// Close mobile menu when a link is clicked
+mobileNavLinks.forEach((link) => {
+  link.addEventListener("click", closeMobileMenu);
+});
+
+// Close mobile menu when clicking outside
+document.addEventListener("click", (event) => {
+  if (
+    !event.target.closest(".site-header") &&
+    mobileNav.classList.contains("active")
+  ) {
+    closeMobileMenu();
+  }
+});
+
+// Close mobile menu on window resize
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 768) {
+    closeMobileMenu();
+  }
+});
+
 updateClock();
 setInterval(updateClock, 30000);
 setStoryState(0);
