@@ -989,6 +989,29 @@ input {
   outline: none;
 }
 
+.download-app-button {
+  gap: 10px;
+  margin-top: 16px;
+  border: 1px solid #a97fff;
+}
+
+.download-app-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.download-app-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.download-app-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .form-status {
   min-height: 24px;
   margin-top: 12px;

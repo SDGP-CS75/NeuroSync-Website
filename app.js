@@ -9,6 +9,9 @@ const heroUi = document.querySelector(".hero-ui");
 const phoneScenes = document.querySelectorAll("[data-phone-scene]");
 const ctaForm = document.querySelector(".cta-form");
 const formStatus = document.getElementById("form-status");
+const downloadAppButton = document.getElementById("download-app-btn");
+const downloadNavLink = document.getElementById("download-nav-link");
+const downloadMobileLink = document.getElementById("download-mobile-link");
 const deviceClock = document.getElementById("device-clock");
 
 const featureOrder = ["focus", "breakdown", "routine", "mood", "dashboard"];
@@ -285,6 +288,64 @@ ctaForm.addEventListener("submit", (event) => {
     : "Enter an email if you'd like to join the NeuroSync beta.";
 });
 
+async function loadApkUrl() {
+  const downloadTargets = [
+    downloadAppButton,
+    downloadNavLink,
+    downloadMobileLink,
+  ].filter(Boolean);
+
+  if (!downloadTargets.length) return;
+
+  const apkJsonPaths = ["./public/apk.json", "./apk.json"];
+
+  const setDownloadTargets = (apkUrl) => {
+    if (!apkUrl) return false;
+
+    downloadTargets.forEach((target) => {
+      if (target.tagName === "A") {
+        target.href = apkUrl;
+        target.target = "_blank";
+        target.rel = "noopener noreferrer";
+        target.removeAttribute("aria-disabled");
+        return;
+      }
+
+      target.disabled = false;
+      target.addEventListener("click", () => {
+        window.open(apkUrl, "_blank", "noopener,noreferrer");
+      });
+    });
+
+    return true;
+  };
+
+  for (const path of apkJsonPaths) {
+    try {
+      const response = await fetch(path, { cache: "no-store" });
+      if (!response.ok) continue;
+
+      const data = await response.json();
+      if (setDownloadTargets(data.apkUrl)) return;
+    } catch (error) {
+      // Try the next possible JSON path.
+    }
+  }
+
+  if (downloadAppButton) {
+    downloadAppButton.textContent =
+      window.location.protocol === "file:"
+        ? "Run with a local server to load apk.json"
+        : "App link unavailable";
+  }
+
+  [downloadNavLink, downloadMobileLink].filter(Boolean).forEach((link) => {
+    link.textContent = "Download unavailable";
+    link.removeAttribute("href");
+    link.setAttribute("aria-disabled", "true");
+  });
+}
+
 // Mobile menu toggle functionality
 const mobileMenuToggle = document.getElementById("mobileMenuToggle");
 const mobileNav = document.getElementById("mobileNav");
@@ -328,6 +389,7 @@ window.addEventListener("resize", () => {
 });
 
 updateClock();
+loadApkUrl();
 setInterval(updateClock, 30000);
 setStoryState(0);
 window.scrollTo(0, 0);
