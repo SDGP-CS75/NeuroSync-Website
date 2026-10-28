@@ -8,11 +8,8 @@
   <meta name="description"
     content="NeuroSync is a calm productivity companion for ADHD minds, designed to reduce overwhelm with gentle routines, task support, and emotion-aware focus." />
   <link rel="icon" type="image/jpeg" href="./logo.jpeg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preload" href="./assets/fonts/lexend-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="./styles.css" />
-  <link rel="stylesheet" href="./nymo-intro.css" />
 </head>
 
 <body>
@@ -30,7 +27,13 @@
   <header class="site-header">
     <a class="brand" href="#hero" aria-label="NeuroSync home">
       <span class="brand-mark">
-        <img src="./logo.png" alt="" />
+        <picture class="brand-picture">
+          <source type="image/avif"
+            srcset="./assets/images/logo-96.avif 96w, ./assets/images/logo-192.avif 192w" sizes="46px" />
+          <source type="image/webp"
+            srcset="./assets/images/logo-96.webp 96w, ./assets/images/logo-192.webp 192w" sizes="46px" />
+          <img src="./logo.png" alt="" width="192" height="192" />
+        </picture>
       </span>
       <span class="brand-copy">
         <strong>NeuroSync</strong>
@@ -105,7 +108,16 @@
                 </div>
 
                 <div class="splash-logo-wrap">
-                  <img src="./splash-logo.png" alt="NeuroSync Logo" class="splash-logo" />
+                  <picture>
+                    <source type="image/avif"
+                      srcset="./assets/images/splash-logo-320.avif 320w, ./assets/images/splash-logo-520.avif 520w"
+                      sizes="260px" />
+                    <source type="image/webp"
+                      srcset="./assets/images/splash-logo-320.webp 320w, ./assets/images/splash-logo-520.webp 520w"
+                      sizes="260px" />
+                    <img src="./splash-logo.png" alt="NeuroSync lotus logo" class="splash-logo" width="520"
+                      height="520" fetchpriority="high" />
+                  </picture>
                 </div>
               </div>
             </div>
@@ -206,27 +218,52 @@
                 <div class="screen-noise"></div>
 
                 <div class="screen-state is-visible" data-screen="focus" style="padding:0; overflow:hidden;">
-                  <img src="./story-screen.png" alt="Your Calm Focus Companion" class="story-screen-img" />
+                  <picture>
+                    <source type="image/avif" srcset="./assets/images/story-screen-440.avif" />
+                    <source type="image/webp" srcset="./assets/images/story-screen-440.webp" />
+                    <img src="./story-screen.png" alt="Focus mode with a calm timer and soundscape"
+                      class="story-screen-img" width="440" height="956" loading="lazy" decoding="async" />
+                  </picture>
                 </div>
 
                 <div class="screen-state" data-screen="breakdown" aria-hidden="true"
                   style="padding:0; overflow:hidden;">
-                  <img src="./story-screen-2.png" alt="AI Task Breakdown" class="story-screen-img" />
+                  <picture>
+                    <source type="image/avif" srcset="./assets/images/story-screen-2-440.avif" />
+                    <source type="image/webp" srcset="./assets/images/story-screen-2-440.webp" />
+                    <img src="./story-screen-2.png" alt="AI task breakdown with suggested subtasks"
+                      class="story-screen-img" width="440" height="956" loading="lazy" decoding="async" />
+                  </picture>
                 </div>
 
                 <div class="screen-state" data-screen="routine" aria-hidden="true"
                   style="padding:0; overflow:hidden;">
-                  <img src="./story-screen-3.png" alt="Reach your full potential" class="story-screen-img" />
+                  <picture>
+                    <source type="image/avif" srcset="./assets/images/story-screen-3-440.avif" />
+                    <source type="image/webp" srcset="./assets/images/story-screen-3-440.webp" />
+                    <img src="./story-screen-3.png" alt="Adaptive routine guidance"
+                      class="story-screen-img" width="440" height="956" loading="lazy" decoding="async" />
+                  </picture>
                 </div>
 
                 <div class="screen-state" data-screen="mood" aria-hidden="true"
                   style="padding:0; overflow:hidden;">
-                  <img src="./story-screen-4.png" alt="Mood Journal" class="story-screen-img" />
+                  <picture>
+                    <source type="image/avif" srcset="./assets/images/story-screen-4-440.avif" />
+                    <source type="image/webp" srcset="./assets/images/story-screen-4-440.webp" />
+                    <img src="./story-screen-4.png" alt="Mood journal check-in"
+                      class="story-screen-img" width="440" height="956" loading="lazy" decoding="async" />
+                  </picture>
                 </div>
 
                 <div class="screen-state" data-screen="dashboard" aria-hidden="true"
                   style="padding:0; overflow:hidden;">
-                  <img src="./story-screen-5.png" alt="Dashboard" class="story-screen-img" />
+                  <picture>
+                    <source type="image/avif" srcset="./assets/images/story-screen-5-440.avif" />
+                    <source type="image/webp" srcset="./assets/images/story-screen-5-440.webp" />
+                    <img src="./story-screen-5.png" alt="NeuroSync dashboard with tasks and routines"
+                      class="story-screen-img" width="440" height="956" loading="lazy" decoding="async" />
+                  </picture>
                 </div>
               </div>
             </div>
@@ -287,7 +324,16 @@
       <div class="team-grid">
         <article class="team-card reveal">
           <div class="team-avatar team-avatar-photo">
-            <img src="./sujaya.png" alt="Sujaya De Silva" />
+            <picture>
+              <source type="image/avif"
+                srcset="./assets/images/sujaya-160.avif 160w, ./assets/images/sujaya-320.avif 320w"
+                sizes="145px" />
+              <source type="image/webp"
+                srcset="./assets/images/sujaya-160.webp 160w, ./assets/images/sujaya-320.webp 320w"
+                sizes="145px" />
+              <img src="./sujaya.png" alt="Sujaya De Silva" width="320" height="320" loading="lazy"
+                decoding="async" />
+            </picture>
           </div>
           <div class="team-info">
             <strong>Sujaya De Silva</strong>
@@ -297,7 +343,16 @@
 
         <article class="team-card reveal">
           <div class="team-avatar team-avatar-photo">
-            <img src="./team-sf.jpg" alt="Chamath Silva" />
+            <picture>
+              <source type="image/avif"
+                srcset="./assets/images/team-sf-160.avif 160w, ./assets/images/team-sf-320.avif 320w"
+                sizes="145px" />
+              <source type="image/webp"
+                srcset="./assets/images/team-sf-160.webp 160w, ./assets/images/team-sf-320.webp 320w"
+                sizes="145px" />
+              <img src="./team-sf.jpg" alt="Chamath Silva" width="320" height="320" loading="lazy"
+                decoding="async" />
+            </picture>
           </div>
           <div class="team-info">
             <strong>Chamath Silva</strong>
@@ -307,7 +362,16 @@
 
         <article class="team-card reveal">
           <div class="team-avatar team-avatar-photo">
-            <img src="./jinalle.png" alt="Jinalee Subasinghe" />
+            <picture>
+              <source type="image/avif"
+                srcset="./assets/images/jinalle-160.avif 160w, ./assets/images/jinalle-320.avif 320w"
+                sizes="145px" />
+              <source type="image/webp"
+                srcset="./assets/images/jinalle-160.webp 160w, ./assets/images/jinalle-320.webp 320w"
+                sizes="145px" />
+              <img src="./jinalle.png" alt="Jinalee Subasinghe" width="320" height="320" loading="lazy"
+                decoding="async" />
+            </picture>
           </div>
           <div class="team-info">
             <strong>Jinalee Subasinghe</strong>
@@ -317,7 +381,16 @@
 
         <article class="team-card reveal">
           <div class="team-avatar team-avatar-photo">
-            <img src="./nadil.png" alt="Nadil Karunarathna" />
+            <picture>
+              <source type="image/avif"
+                srcset="./assets/images/nadil-160.avif 160w, ./assets/images/nadil-320.avif 320w"
+                sizes="145px" />
+              <source type="image/webp"
+                srcset="./assets/images/nadil-160.webp 160w, ./assets/images/nadil-320.webp 320w"
+                sizes="145px" />
+              <img src="./nadil.png" alt="Nadil Karunarathna" width="320" height="320" loading="lazy"
+                decoding="async" />
+            </picture>
           </div>
           <div class="team-info">
             <strong>Nadil Karunarathna</strong>
@@ -327,7 +400,16 @@
 
         <article class="team-card reveal">
           <div class="team-avatar team-avatar-photo">
-            <img src="./ravindu.jpeg" alt="Ravindu Withana" />
+            <picture>
+              <source type="image/avif"
+                srcset="./assets/images/ravindu-160.avif 160w, ./assets/images/ravindu-320.avif 320w"
+                sizes="145px" />
+              <source type="image/webp"
+                srcset="./assets/images/ravindu-160.webp 160w, ./assets/images/ravindu-320.webp 320w"
+                sizes="145px" />
+              <img src="./ravindu.jpeg" alt="Ravindu Withana" width="320" height="320" loading="lazy"
+                decoding="async" />
+            </picture>
           </div>
           <div class="team-info">
             <strong>Ravindu Withana</strong>
@@ -337,7 +419,16 @@
 
         <article class="team-card reveal">
           <div class="team-avatar team-avatar-photo">
-            <img src="./sandun.jpeg" alt="Sandun Gunawardana" />
+            <picture>
+              <source type="image/avif"
+                srcset="./assets/images/sandun-160.avif 160w, ./assets/images/sandun-320.avif 320w"
+                sizes="145px" />
+              <source type="image/webp"
+                srcset="./assets/images/sandun-160.webp 160w, ./assets/images/sandun-320.webp 320w"
+                sizes="145px" />
+              <img src="./sandun.jpeg" alt="Sandun Gunawardana" width="320" height="320" loading="lazy"
+                decoding="async" />
+            </picture>
           </div>
           <div class="team-info">
             <strong>Sandun Gunawardana</strong>

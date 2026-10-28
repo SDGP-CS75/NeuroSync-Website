@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Lexend";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("./assets/fonts/lexend-latin.woff2") format("woff2");
+}
+
 :root {
   --bg: #f5f7fb;
   --surface: rgba(255, 255, 255, 0.68);
@@ -32,7 +40,8 @@ section[id] {
 
 body {
   margin: 0;
-  font-family: "Lexend", "Segoe UI", sans-serif;
+  font-family: "Lexend", system-ui, sans-serif;
+  font-synthesis: none;
   color: var(--text);
   background:
     radial-gradient(circle at 15% 12%, rgba(195, 175, 255, 0.45), transparent 28%),
@@ -177,6 +186,12 @@ input {
   display: block;
   object-fit: contain;
   transform: scale(1.1);
+}
+
+.brand-picture {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .brand-mark::after {
@@ -528,6 +543,13 @@ input {
   align-items: center;
   justify-content: center;
   transform: translateY(-20px);
+}
+
+.splash-logo-wrap picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .splash-logo {
@@ -963,6 +985,12 @@ input {
   object-fit: cover;
   object-position: center top;
   display: block;
+}
+
+.team-avatar picture {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .team-info {
