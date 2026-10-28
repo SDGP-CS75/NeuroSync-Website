@@ -51,6 +51,28 @@ GitHub Actions runs static and browser checks for pull requests into `master`
 and pushes to `master` or `sujaya-main`. A separate scheduled workflow checks
 the hosted beta download every day.
 
+## Story screenshot quality
+
+The five app screens use the root `story-screen*.png` files as their source
+images. The current originals are `440x956`.
+
+```bash
+# Requires cwebp, dwebp, and avifenc
+npm run build:story-images
+```
+
+The command generates genuine `220w` and `440w` AVIF/WebP variants from a
+lossless intermediate, then the landing page selects the appropriate file for
+the rendered phone size and display density. Do not label a smaller export as a
+larger width; that caused the earlier mockups to be stretched from `202x440`.
+
+For a genuinely sharp desktop result at 2x pixel density, provide the same five
+UI-only screenshots at `880x1912` PNG. For 3x displays, provide
+`1320x2868` PNG. Keep the `440:956` aspect ratio and export without an external
+phone frame. The existing `440x956` sources are sufficient for the immediate
+fix and mobile 2x rendering, but they cannot create detail that was never
+captured.
+
 ## Branch and deployment workflow
 
 - `master` is the production branch. Vercel deploys it after a pull request is merged.
