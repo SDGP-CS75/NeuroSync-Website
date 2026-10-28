@@ -8,6 +8,7 @@
     "build": "echo 'Static site - no build required'",
     "start": "node scripts/serve.mjs 3000",
     "check:site": "node scripts/check-site.mjs",
+    "check:download": "node scripts/check-download.mjs",
     "test:browser": "node scripts/browser-smoke.mjs",
     "test": "npm run check:site && npm run test:browser"
   },
