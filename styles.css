@@ -185,6 +185,11 @@ input {
   color: var(--muted);
 }
 
+.brand-copy small {
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
 .site-nav {
   display: inline-flex;
   gap: 22px;
@@ -252,8 +257,8 @@ input {
 .eyebrow {
   margin: 0 0 16px;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  font-size: 0.82rem;
   font-weight: 700;
 }
 
@@ -1370,7 +1375,7 @@ input {
   }
 
   .brand-copy small {
-    font-size: 0.7rem;
+    font-size: 0.82rem;
   }
 
   .site-nav {
@@ -1967,9 +1972,9 @@ html.story-enhanced .story {
 
 .download-meta dt {
   color: var(--accent-strong);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -2032,7 +2037,7 @@ html.story-enhanced .story {
   grid-column: 1 / -1;
   padding-top: 20px;
   border-top: 1px solid rgba(112, 124, 164, 0.14);
-  font-size: 0.8rem;
+  font-size: 0.84rem;
 }
 
 .footer-inner strong {
@@ -2110,12 +2115,13 @@ html.story-enhanced .story {
   }
 
   .story-step + .story-step {
-    margin-top: 48px;
-    padding-top: 48px;
+    margin-top: 40px;
+    padding-top: 40px;
   }
 
   .story-step-phone {
     width: min(238px, 68vw);
+    margin-top: 24px;
   }
 
   .problem,
