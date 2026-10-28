@@ -4,9 +4,12 @@
   "description": "NeuroSync - A calm productivity companion for ADHD minds",
   "main": "index.html",
   "scripts": {
-    "dev": "npx serve -l 3000",
+    "dev": "node scripts/serve.mjs 3000",
     "build": "echo 'Static site - no build required'",
-    "start": "npx serve -l 3000"
+    "start": "node scripts/serve.mjs 3000",
+    "check:site": "node scripts/check-site.mjs",
+    "test:browser": "node scripts/browser-smoke.mjs",
+    "test": "npm run check:site && npm run test:browser"
   },
   "keywords": [
     "neurosync",
@@ -17,7 +20,7 @@
   ],
   "author": "NeuroSync Team",
   "license": "MIT",
-  "devDependencies": {
-    "serve": "^14.2.0"
+  "engines": {
+    "node": ">=20"
   }
 }

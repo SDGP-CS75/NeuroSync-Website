@@ -39,6 +39,23 @@ a {
   outline-offset: 4px;
 }
 
+.skip-link {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 10;
+  padding: 12px 18px;
+  color: #ffffff;
+  background: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-180%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .legal-header {
   width: min(calc(100% - 40px), 960px);
   margin: 0 auto;
