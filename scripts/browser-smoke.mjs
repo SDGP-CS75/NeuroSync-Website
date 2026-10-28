@@ -7,6 +7,27 @@ import { startStaticServer } from "./lib/static-server.mjs";
 
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
+function reportFatalError(error) {
+  console.error(error instanceof Error ? error.stack : error);
+  if (process.env.GITHUB_ACTIONS === "true") {
+    const message = String(error instanceof Error ? error.message : error)
+      .replaceAll("%", "%25")
+      .replaceAll("\r", "%0D")
+      .replaceAll("\n", "%0A");
+    console.log(`::error title=Browser smoke failure::${message}`);
+  }
+}
+
+process.on("uncaughtException", (error) => {
+  reportFatalError(error);
+  process.exitCode = 1;
+});
+
+process.on("unhandledRejection", (error) => {
+  reportFatalError(error);
+  process.exitCode = 1;
+});
+
 async function findChrome() {
   const candidates = [
     process.env.CHROME_BIN,
@@ -283,6 +304,7 @@ try {
       "--hide-scrollbars",
       "--no-first-run",
       "--no-default-browser-check",
+      "--no-sandbox",
       "--remote-debugging-port=0",
       `--user-data-dir=${userDataDir}`,
       "about:blank",
