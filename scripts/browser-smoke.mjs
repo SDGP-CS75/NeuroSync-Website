@@ -184,6 +184,24 @@ async function runViewportChecks(client, origin, { width, height, mobile }) {
   assert(layout.brokenImages === 0, `${width}px: ${layout.brokenImages} image(s) failed to load.`);
   assert(layout.size === "88.8 MB", `${width}px: APK metadata did not load.`);
 
+  await client.evaluate(
+    'document.querySelector(".story-step-phone").scrollIntoView({ block: "center" })'
+  );
+  await delay(500);
+  const mobileScreenshot = await client.evaluate(`(async () => {
+    const image = document.querySelector(".story-step-phone img");
+    const bitmap = await createImageBitmap(await (await fetch(image.currentSrc)).blob());
+    return {
+      width: bitmap.width,
+      height: bitmap.height,
+      src: image.currentSrc
+    };
+  })()`);
+  assert(
+    mobileScreenshot.width >= 220 && mobileScreenshot.height >= 478,
+    `${width}px: story screenshot ${mobileScreenshot.src} is ${mobileScreenshot.width}x${mobileScreenshot.height}; expected at least 220x478.`
+  );
+
   const downloadLinks = await client.evaluate(`[
     ...document.querySelectorAll("[data-download-link]")
   ].every((link) => link.href.endsWith(".apk"))`);
@@ -247,6 +265,22 @@ async function runInteractionChecks(client, origin) {
   })()`);
   assert(storyGeometry.enhanced, "The desktop story did not enter its pinned presentation.");
   assert(storyGeometry.stepCount === 5, "The desktop story is missing one or more steps.");
+
+  await client.evaluate('document.querySelector(".story").scrollIntoView()');
+  await delay(500);
+  const desktopScreenshot = await client.evaluate(`(async () => {
+    const image = document.querySelector(".screen-state.is-visible img");
+    const bitmap = await createImageBitmap(await (await fetch(image.currentSrc)).blob());
+    return {
+      width: bitmap.width,
+      height: bitmap.height,
+      src: image.currentSrc
+    };
+  })()`);
+  assert(
+    desktopScreenshot.width >= 440 && desktopScreenshot.height >= 956,
+    `Desktop story screenshot ${desktopScreenshot.src} is ${desktopScreenshot.width}x${desktopScreenshot.height}; expected at least 440x956.`
+  );
 
   const travel = storyGeometry.height - storyGeometry.viewport;
   const fractions = [0.05, 0.25, 0.45, 0.65, 0.85];
@@ -332,6 +366,37 @@ async function runProgressiveEnhancementChecks(client, origin) {
   await client.send("Emulation.setScriptExecutionDisabled", { value: false });
 }
 
+async function runHighDensityImageChecks(client, origin) {
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width: 1440,
+    height: 900,
+    deviceScaleFactor: 2,
+    mobile: false,
+  });
+  await navigate(client, origin);
+  await client.evaluate('document.querySelector(".story").scrollIntoView()');
+  await delay(500);
+
+  const screenshot = await client.evaluate(`(async () => {
+    const image = document.querySelector(".screen-state.is-visible img");
+    const bitmap = await createImageBitmap(await (await fetch(image.currentSrc)).blob());
+    return {
+      src: image.currentSrc,
+      width: bitmap.width,
+      height: bitmap.height
+    };
+  })()`);
+
+  assert(
+    screenshot.src.includes("-440."),
+    `High-density desktop selected ${screenshot.src} instead of the 440w variant.`
+  );
+  assert(
+    screenshot.width >= 440 && screenshot.height >= 956,
+    `High-density desktop selected ${screenshot.width}x${screenshot.height} instead of at least 440x956.`
+  );
+}
+
 const chromePath = await findChrome();
 const userDataDir = await mkdtemp(path.join(os.tmpdir(), "neurosync-chrome-"));
 const server = await startStaticServer({ root: process.cwd() });
@@ -378,6 +443,7 @@ try {
   await runViewportChecks(client, server.origin, { width: 768, height: 1024, mobile: true });
   await runViewportChecks(client, server.origin, { width: 390, height: 844, mobile: true });
   await runInteractionChecks(client, server.origin);
+  await runHighDensityImageChecks(client, server.origin);
   await runProgressiveEnhancementChecks(client, server.origin);
 
   assert(client.errors.length === 0, `Browser errors:\n${client.errors.join("\n")}`);
