@@ -1,124 +1,151 @@
-# Vercel Deployment Guide for NeuroSync Website
+# Vercel Deployment Guide
 
-## Quick Start
+Production site: [neurosync-website.vercel.app](https://neurosync-website.vercel.app/)
 
-Your project is now ready for Vercel deployment! Follow these steps:
+## Branch model
 
-### Method 1: Deploy via Vercel Dashboard (Recommended for beginners)
+- `master` is the production branch.
+- `sujaya-main` is the working integration branch.
+- Website work is committed and pushed to `sujaya-main`.
+- A pull request merges `sujaya-main` into `master`.
+- Vercel creates a preview deployment for pull requests and deploys production
+  when the pull request is merged into `master`.
 
-1. **Create a Git Repository**
-   - Push your code to GitHub, GitLab, or Bitbucket
-   - Make sure to include all files: `index.html`, `styles.css`, `app.js`, `vercel.json`, `package.json`, `.gitignore`, and all image assets
+Do not deploy an unmerged local directory directly to production. It bypasses
+the checks and review history in the pull request.
 
-2. **Deploy on Vercel**
-   - Go to [vercel.com](https://vercel.com) and sign up/login
-   - Click "New Project"
-   - Import your Git repository
-   - Vercel will automatically detect the configuration
-   - Click "Deploy"
-   - Your site will be live in seconds!
+## Vercel project settings
 
-### Method 2: Deploy via Vercel CLI
+Use the repository root with these settings:
 
-1. **Install Vercel CLI**
-   ```bash
-   npm install -g vercel
-   ```
+- Framework preset: Other
+- Build command: `npm run build` or leave empty
+- Output directory: `.`
+- Install command: `npm ci`
+- Production branch: `master`
 
-2. **Login to Vercel**
-   ```bash
-   vercel login
-   ```
+The site is static. `npm run build` only confirms that no compilation step is
+required.
 
-3. **Deploy**
-   ```bash
-   # For preview deployment
-   vercel
+## CLI deployment
 
-   # For production deployment
-   vercel --prod
-   ```
-
-### Method 3: One-time Deploy (No account needed initially)
+Install and authenticate the CLI if a dashboard deployment is not available:
 
 ```bash
-npx vercel
+npm install --global vercel
+vercel login
 ```
 
-This will guide you through the deployment process and create an account if needed.
+Create a preview from the current branch:
 
-## What's Been Configured
+```bash
+vercel
+```
 
-### 1. `vercel.json`
-- Static file serving configuration
-- Security headers (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)
-- Cache headers for images, CSS, and JS files (1 year cache)
-- Route handling for all files
+Promote only a reviewed `master` revision:
 
-### 2. `package.json`
-- Project metadata
-- Development scripts for local testing
-- Dependencies for local development server
+```bash
+vercel --prod
+```
 
-### 3. `.gitignore`
-- Excludes unnecessary files from deployment
-- Prevents node_modules, .env files, and IDE files from being deployed
+## Headers and caching
 
-### 4. `index.html`
-- Removed server-side include directive (not supported on Vercel)
-- All assets use relative paths (./) for proper deployment
+`vercel.json` defines the production security and cache policy:
 
-## Post-Deployment
+- Content Security Policy, `nosniff`, frame denial, strict referrer policy, and
+  a restrictive permissions policy
+- HTML, CSS, and JavaScript revalidate so an unversioned deployment cannot be
+  stranded on a one-year immutable cache
+- Images and fonts use one-day caching plus seven-day stale-while-revalidate
+- `public/apk.json` is explicitly `no-store`
 
-### Custom Domain (Optional)
-1. Go to your project dashboard on Vercel
-2. Click "Settings" → "Domains"
-3. Add your custom domain
-4. Follow Vercel's instructions to update DNS records
+The obsolete `X-XSS-Protection` header is intentionally not used.
 
-### Environment Variables (If needed)
-1. Go to project dashboard
-2. Click "Settings" → "Environment Variables"
-3. Add any required variables
+## Beta APK release procedure
 
-### Automatic Deployments
-- Every push to your main branch will trigger a new deployment
-- Pull requests will create preview deployments
+The current APK is an Expo EAS temporary artifact. Expo artifact links expire,
+so the project includes both a visible expiry notice and an automated monitor.
+
+1. Build and sign the Android APK.
+2. Publish it to a durable HTTPS location controlled by the project, preferably
+   a GitHub Release asset.
+3. Update `public/apk.json`:
+
+   ```json
+   {
+     "channel": "Android beta",
+     "hosting": "GitHub Releases",
+     "apkUrl": "https://github.com/ORG/REPO/releases/download/TAG/neurosync.apk",
+     "sizeBytes": 93131705,
+     "listedAt": "2026-10-28T07:33:41Z",
+     "feedbackUrl": "https://github.com/SDGP-CS75/NeuroSync-Website/issues/new?title=NeuroSync%20beta%20feedback"
+   }
+   ```
+
+   `expiresAt` is optional. Include it only when the host actually expires the
+   artifact; omit it for a durable GitHub Release or equivalent host. Add
+   `sha256` with the verified 64-character checksum when one is available.
+
+   Compute the checksum from the exact file uploaded to the host:
+
+   ```bash
+   shasum -a 256 path/to/neurosync.apk
+   ```
+
+4. Update the static fallback values and release list in `index.html` and
+   `support.html`.
+5. Run:
+
+   ```bash
+   npm run check:download
+   npm test
+   ```
+
+6. Commit to `sujaya-main`, push, and include the update in the pull request to
+   `master`.
+
+The scheduled `Beta download check` workflow makes a one-byte range request,
+compares the host's byte size with `sizeBytes`, and fails when an `expiresAt`
+value is present and has passed. A failed scheduled workflow is the signal to
+publish a replacement build before users encounter a dead link.
+
+## Pre-merge checklist
+
+- `npm test` passes.
+- `npm run check:download` passes for any APK metadata change.
+- Desktop, tablet, and mobile previews have no horizontal overflow.
+- Download, support, privacy, and terms links open the intended destination.
+- No new console errors or failed image requests appear.
+- The pull request targets `master`.
 
 ## Troubleshooting
 
-### Images not loading?
-- All image paths use relative paths (./)
-- Make sure all images are in the root directory
-- Check that file names match exactly (case-sensitive)
+### A page returns 404
 
-### APK download not working?
-- The `public/apk.json` file contains the APK URL
-- Update the URL in `public/apk.json` if needed:
-  ```json
-  {
-    "apkUrl": "https://your-new-url.apk"
-  }
-  ```
+Confirm the requested file exists at the repository root. `404.html` is served
+for unmatched routes.
 
-### Build errors?
-- This is a static site, no build step is required
-- If you see errors, check that all files are present
-- Verify `vercel.json` syntax is correct
+### An asset changed but users see the old version
 
-## Performance Optimization
+Confirm the deployment includes the current `vercel.json`. CSS and JavaScript
+must revalidate; do not restore one-year immutable caching for unversioned
+files.
 
-The deployment includes:
-- ✅ Static file caching (1 year for assets)
-- ✅ Security headers
-- ✅ Optimized image delivery
-- ✅ CDN distribution worldwide
-- ✅ Automatic HTTPS
+### The beta download fails
+
+Run `npm run check:download`. If the Expo artifact expired, publish a new APK,
+update `public/apk.json` and the support page, then repeat the release
+procedure. For the current 11 November 2026 deadline, move the APK to a GitHub
+Release asset or another durable HTTPS host instead of rebuilding only another
+temporary EAS artifact. Never point users to an unverified mirror.
+
+### Browser tests cannot find Chrome
+
+Install Chrome or Chromium, or set `CHROME_BIN` to its executable path before
+running `npm run test:browser`.
 
 ## Support
 
-For Vercel-specific issues, visit:
-- [Vercel Documentation](https://vercel.com/docs)
-- [Vercel Support](https://vercel.com/support)
-
-For project-specific issues, contact the NeuroSync team.
+- [Vercel documentation](https://vercel.com/docs)
+- [Project support page](https://neurosync-website.vercel.app/support.html)
+- [Project issue tracker](https://github.com/SDGP-CS75/NeuroSync-Website/issues)

@@ -29,3 +29,6 @@ build/
 
 # Vercel
 .vercel/
+
+# Local design tooling
+.taste-skill/

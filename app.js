@@ -1,399 +1,546 @@
-const revealElements = document.querySelectorAll(".reveal");
-const splitTargets = document.querySelectorAll(".split-text");
-const storySection = document.querySelector(".story");
-const storySteps = [...document.querySelectorAll(".story-step")];
-const storyScreens = [...document.querySelectorAll(".screen-state")];
-const heroPhone = document.querySelector(".hero-phone");
-const storyPhone = document.querySelector(".story-device");
-const heroUi = document.querySelector(".hero-ui");
-const phoneScenes = document.querySelectorAll("[data-phone-scene]");
-const ctaForm = document.querySelector(".cta-form");
-const formStatus = document.getElementById("form-status");
-const downloadAppButton = document.getElementById("download-app-btn");
-const downloadNavLink = document.getElementById("download-nav-link");
-const downloadMobileLink = document.getElementById("download-mobile-link");
-const deviceClock = document.getElementById("device-clock");
+document.documentElement.classList.remove("no-js");
+document.documentElement.classList.add("js");
 
-const featureOrder = ["focus", "breakdown", "routine", "mood", "dashboard"];
-const motionState = {
-  currentScroll: window.scrollY,
-  targetScroll: window.scrollY,
-  lastScroll: window.scrollY,
-  ticking: false,
-};
-const heroMotion = {
-  scale: 0.84,
-  targetScale: 0.84,
-  rotateX: -8,
-  targetRotateX: -8,
-  rotateY: 12,
-  targetRotateY: 12,
-  twist: -6,
-  targetTwist: -6,
-  uiShiftX: 0,
-  targetUiShiftX: 0,
-  uiShiftY: 0,
-  targetUiShiftY: 0,
-};
-const storyMotion = {
-  scale: 0.88,
-  targetScale: 0.88,
-  rotateX: -5,
-  targetRotateX: -5,
-  rotateY: -10,
-  targetRotateY: -10,
-  twist: 4,
-  targetTwist: 4,
-};
+const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+const desktopStoryQuery = window.matchMedia("(min-width: 1081px)");
 
-if ("scrollRestoration" in history) {
-  history.scrollRestoration = "manual";
+const clamp = (value, minimum, maximum) =>
+  Math.min(Math.max(value, minimum), maximum);
+
+const lerp = (current, target, ease) => current + (target - current) * ease;
+
+function setupReveals() {
+  const revealElements = [...document.querySelectorAll(".reveal")];
+  if (!revealElements.length) return;
+
+  if (!("IntersectionObserver" in window) || reducedMotionQuery.matches) {
+    revealElements.forEach((element) => element.classList.add("visible"));
+    return;
+  }
+
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("visible");
+        revealObserver.unobserve(entry.target);
+      });
+    },
+    { rootMargin: "0px 0px -8% 0px", threshold: 0.12 }
+  );
+
+  revealElements.forEach((element) => {
+    const initialBounds = element.getBoundingClientRect();
+    if (initialBounds.top < window.innerHeight * 0.95 && initialBounds.bottom > 0) {
+      element.classList.add("visible");
+      return;
+    }
+
+    element.classList.add("reveal-pending");
+    revealObserver.observe(element);
+  });
+
+  reducedMotionQuery.addEventListener("change", (event) => {
+    if (!event.matches) return;
+    revealObserver.disconnect();
+    revealElements.forEach((element) => {
+      element.classList.remove("reveal-pending");
+      element.classList.add("visible");
+    });
+  });
 }
 
-function splitText(target) {
-  const text = target.textContent.trim();
-  target.textContent = "";
+function setupStory() {
+  const storySection = document.querySelector(".story");
+  const storySteps = [...document.querySelectorAll(".story-step")];
+  const storyScreens = [...document.querySelectorAll(".screen-state")];
 
-  let globalIndex = 0;
-  const words = text.split(" ");
+  if (!storySection || !storySteps.length || !storyScreens.length) return;
 
-  words.forEach((word, wordIndex) => {
-    const wordSpan = document.createElement("span");
-    wordSpan.className = "split-word";
-    wordSpan.style.display = "inline-block";
-    wordSpan.style.whiteSpace = "nowrap";
+  let currentIndex = -1;
+  let ticking = false;
 
-    [...word].forEach((char) => {
-      const charSpan = document.createElement("span");
-      charSpan.className = "split-char";
-      charSpan.textContent = char;
-      charSpan.style.transitionDelay = `${globalIndex * 22}ms`;
-      wordSpan.appendChild(charSpan);
-      globalIndex++;
+  function isPinned() {
+    return desktopStoryQuery.matches && !reducedMotionQuery.matches;
+  }
+
+  function setStoryState(index) {
+    const pinned = isPinned();
+    document.documentElement.classList.toggle("story-enhanced", pinned);
+
+    storySteps.forEach((step, stepIndex) => {
+      const isActive = !pinned || stepIndex === index;
+      step.classList.toggle("active", isActive);
+
+      if (isActive) {
+        step.removeAttribute("aria-hidden");
+        step.removeAttribute("inert");
+      } else {
+        step.setAttribute("aria-hidden", "true");
+        step.setAttribute("inert", "");
+      }
     });
 
-    target.appendChild(wordSpan);
+    storyScreens.forEach((screen, screenIndex) => {
+      const isVisible = !pinned || screenIndex === index;
+      screen.classList.toggle("is-visible", isVisible);
+      screen.setAttribute("aria-hidden", String(!isVisible));
+    });
+  }
 
-    if (wordIndex < words.length - 1) {
-      const spaceSpan = document.createElement("span");
-      spaceSpan.className = "split-space";
-      spaceSpan.textContent = " ";
-      target.appendChild(spaceSpan);
-      globalIndex++;
+  function updateStoryProgress() {
+    if (!isPinned()) {
+      document.documentElement.classList.remove("story-enhanced");
+      if (currentIndex !== -2) {
+        currentIndex = -2;
+        setStoryState(0);
+      }
+      return;
+    }
+
+    document.documentElement.classList.add("story-enhanced");
+
+    const sectionTop = storySection.getBoundingClientRect().top + window.scrollY;
+    const travel = Math.max(storySection.offsetHeight - window.innerHeight, 1);
+    const progress = clamp((window.scrollY - sectionTop) / travel, 0, 0.999);
+    const index = Math.min(
+      storySteps.length - 1,
+      Math.floor(progress * storySteps.length)
+    );
+
+    if (index !== currentIndex) {
+      currentIndex = index;
+      setStoryState(index);
+    }
+  }
+
+  function requestStoryUpdate() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(() => {
+      updateStoryProgress();
+      ticking = false;
+    });
+  }
+
+  window.addEventListener("scroll", requestStoryUpdate, { passive: true });
+  window.addEventListener("resize", requestStoryUpdate);
+  desktopStoryQuery.addEventListener("change", requestStoryUpdate);
+  reducedMotionQuery.addEventListener("change", requestStoryUpdate);
+
+  updateStoryProgress();
+}
+
+function setupMobileMenu() {
+  const toggle = document.getElementById("mobileMenuToggle");
+  const mobileNav = document.getElementById("mobileNav");
+  if (!toggle || !mobileNav) return;
+
+  const links = [...mobileNav.querySelectorAll("a")];
+
+  function setMenu(open, returnFocus = false) {
+    const focusWasInside = mobileNav.contains(document.activeElement);
+
+    toggle.classList.toggle("active", open);
+    mobileNav.classList.toggle("active", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    mobileNav.setAttribute("aria-hidden", String(!open));
+    mobileNav.toggleAttribute("inert", !open);
+
+    if (returnFocus || (!open && focusWasInside)) {
+      toggle.focus();
+    }
+  }
+
+  setMenu(false);
+
+  toggle.addEventListener("click", () => {
+    setMenu(!mobileNav.classList.contains("active"));
+  });
+
+  links.forEach((link) => {
+    link.addEventListener("click", () => setMenu(false));
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest(".site-header")) {
+      setMenu(false);
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && mobileNav.classList.contains("active")) {
+      setMenu(false, true);
+      return;
+    }
+
+    if (event.key !== "Tab" || !mobileNav.classList.contains("active")) {
+      return;
+    }
+
+    const focusable = [toggle, ...links];
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (!focusable.includes(document.activeElement)) {
+      event.preventDefault();
+      first.focus();
+      return;
+    }
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 1080) {
+      setMenu(false);
     }
   });
 }
 
-splitTargets.forEach(splitText);
+function setupClock() {
+  const clock = document.getElementById("device-clock");
+  if (!clock) return;
 
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
+  function updateClock() {
+    const now = new Date();
+    clock.textContent = new Intl.DateTimeFormat([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(now);
+    clock.dateTime = now.toISOString();
+  }
 
-        if (entry.target.classList.contains("split-text")) {
-          entry.target.classList.add("is-visible");
-        }
-      }
+  updateClock();
+  window.setInterval(updateClock, 60_000);
+}
+
+function setupDownloadMetadata() {
+  const downloadTargets = [...document.querySelectorAll("[data-download-link]")];
+  const feedbackTargets = [...document.querySelectorAll("[data-feedback-link]")];
+  const downloadSizes = [...document.querySelectorAll("[data-download-size]")];
+  const downloadChannel = document.querySelector("[data-download-channel]");
+  const downloadHost = document.querySelector("[data-download-host]");
+  const downloadListed = document.querySelector("[data-download-listed]");
+  const downloadExpiry = document.querySelector("[data-download-expiry]");
+  const downloadExpiryRow = document.querySelector("[data-download-expiry-row]");
+  const downloadChecksum = document.querySelector("[data-download-checksum]");
+  const downloadChecksumRow = document.querySelector("[data-download-checksum-row]");
+  const downloadAvailability = document.querySelector("[data-download-availability]");
+
+  const metadataElements = [
+    ...downloadTargets,
+    ...feedbackTargets,
+    ...downloadSizes,
+    downloadChannel,
+    downloadHost,
+    downloadListed,
+    downloadExpiry,
+    downloadExpiryRow,
+    downloadChecksum,
+    downloadChecksumRow,
+    downloadAvailability,
+  ].filter(Boolean);
+
+  if (!metadataElements.length) return;
+
+  const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  function formatDate(value) {
+    const date = new Date(value);
+    return Number.isFinite(date.getTime()) ? dateFormatter.format(date) : null;
+  }
+
+  function applyMetadata(data) {
+    if (!data.apkUrl) return false;
+
+    downloadTargets.forEach((target) => {
+      target.href = data.apkUrl;
+      target.target = "_blank";
+      target.rel = "noopener noreferrer";
     });
-  },
-  { threshold: 0.2 }
-);
 
-revealElements.forEach((element) => revealObserver.observe(element));
-splitTargets.forEach((element) => revealObserver.observe(element));
+    if (data.feedbackUrl) {
+      feedbackTargets.forEach((target) => {
+        target.href = data.feedbackUrl;
+      });
+    }
 
-function setStoryState(index) {
-  storySteps.forEach((step, stepIndex) => {
-    step.classList.toggle("active", stepIndex === index);
+    if (downloadChannel && data.channel) {
+      downloadChannel.textContent = data.channel;
+    }
+
+    if (downloadHost && data.hosting) {
+      downloadHost.textContent = data.hosting;
+    }
+
+    if (Number.isFinite(data.sizeBytes)) {
+      const size = `${(data.sizeBytes / 1024 / 1024).toFixed(1)} MB`;
+      downloadSizes.forEach((element) => {
+        element.textContent = size;
+      });
+    }
+
+    if (downloadListed && data.listedAt) {
+      const listedDate = formatDate(data.listedAt);
+      if (listedDate) downloadListed.textContent = listedDate;
+    }
+
+    const expiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
+    const hasValidExpiry = expiresAt && Number.isFinite(expiresAt.getTime());
+
+    if (downloadExpiry && hasValidExpiry) {
+      downloadExpiry.textContent = dateFormatter.format(expiresAt);
+    }
+    if (downloadExpiryRow) {
+      downloadExpiryRow.hidden = !hasValidExpiry;
+    }
+
+    if (downloadChecksum && data.sha256) {
+      downloadChecksum.textContent = data.sha256;
+    }
+    if (downloadChecksumRow) {
+      downloadChecksumRow.hidden = !data.sha256;
+    }
+
+    if (downloadAvailability) {
+      const hosting = data.hosting || "The current download host";
+      if (hasValidExpiry) {
+        downloadAvailability.textContent =
+          Date.now() > expiresAt.getTime()
+            ? `${hosting} listed this build until ${dateFormatter.format(expiresAt)}. It may no longer be available; request a fresh build in the issue tracker if the download fails.`
+            : `${hosting} lists this beta build until ${dateFormatter.format(expiresAt)}.`;
+      } else {
+        downloadAvailability.textContent =
+          `${hosting} hosts this build. No expiry date is listed in the site metadata; verify availability before sharing the link.`;
+      }
+    }
+
+    return true;
+  }
+
+  async function loadMetadata() {
+    for (const path of ["./public/apk.json", "./apk.json"]) {
+      try {
+        const response = await fetch(path, { cache: "no-store" });
+        if (!response.ok) continue;
+        const data = await response.json();
+        if (applyMetadata(data)) return;
+      } catch {
+        // Static download links remain usable if metadata cannot be loaded.
+      }
+    }
+  }
+
+  loadMetadata();
+}
+
+function setupCurrentYear() {
+  document.querySelectorAll("[data-current-year]").forEach((element) => {
+    element.textContent = String(new Date().getFullYear());
   });
-
-  storyScreens.forEach((screen, screenIndex) => {
-    screen.classList.toggle("is-visible", screenIndex === index);
-  });
 }
 
-function updateStoryProgress() {
-  if (!storySection) return;
+function setupPhoneMotion() {
+  const heroPhone = document.querySelector(".hero-phone");
+  const storyPhone = document.querySelector(".story-device");
+  const heroUi = document.querySelector(".hero-ui");
+  const scenes = [...document.querySelectorAll("[data-phone-scene]")];
 
-  const storyTop = storySection.offsetTop;
-  const viewportHeight = window.innerHeight;
-  const total = Math.max(storySection.offsetHeight - viewportHeight, 1);
-  const progress = Math.min(Math.max((motionState.currentScroll - storyTop) / total, 0), 1);
-  const index = Math.min(featureOrder.length - 1, Math.floor(progress * featureOrder.length));
+  if (
+    !heroPhone ||
+    !scenes.length ||
+    reducedMotionQuery.matches ||
+    !window.matchMedia("(pointer: fine)").matches
+  ) {
+    return;
+  }
 
-  setStoryState(index);
+  const heroMotion = {
+    scale: 0.9,
+    targetScale: 0.9,
+    rotateX: -8,
+    targetRotateX: -8,
+    rotateY: 12,
+    targetRotateY: 12,
+    twist: -6,
+    targetTwist: -6,
+    uiShiftX: 0,
+    targetUiShiftX: 0,
+    uiShiftY: 0,
+    targetUiShiftY: 0,
+  };
+  const storyMotion = {
+    scale: 0.95,
+    targetScale: 0.95,
+    rotateX: -5,
+    targetRotateX: -5,
+    rotateY: -10,
+    targetRotateY: -10,
+    twist: 4,
+    targetTwist: 4,
+  };
 
-  const scale = 0.86 + progress * 0.08;
-  const rotateY = -10 + progress * 18;
-  const rotateX = -5 + progress * 8;
-  const twist = 4 - progress * 8;
+  let frame = 0;
 
-  storyMotion.targetScale = scale;
-  storyMotion.targetRotateY = rotateY;
-  storyMotion.targetRotateX = rotateX;
-  storyMotion.targetTwist = twist;
-}
+  function render() {
+    frame = 0;
 
-function updateHeroPhone() {
-  const hero = document.getElementById("hero");
-  if (!hero || !heroPhone) return;
-
-  const viewportHeight = window.innerHeight;
-  const heroTop = hero.offsetTop;
-  const relativeTop = heroTop - motionState.currentScroll;
-  const progress = Math.min(Math.max(1 - relativeTop / viewportHeight, 0), 1.25);
-  const scale = 0.76 + Math.min(progress, 1) * 0.18;
-  const rotateY = 12 - Math.min(progress, 1) * 16;
-  const rotateX = -8 + Math.min(progress, 1) * 10;
-  const twist = -6 + Math.min(progress, 1) * 5;
-
-  heroMotion.targetScale = scale;
-  heroMotion.targetRotateY = rotateY;
-  heroMotion.targetRotateX = rotateX;
-  heroMotion.targetTwist = twist;
-}
-
-function applyScrollDirectionTilt() {
-  const delta = motionState.currentScroll - motionState.lastScroll;
-  const directionTilt = Math.max(Math.min(delta * 0.035, 1.8), -1.8);
-
-  heroMotion.targetRotateX += -directionTilt * 0.7;
-  storyMotion.targetRotateX += -directionTilt * 0.45;
-
-  motionState.lastScroll = motionState.currentScroll;
-}
-
-function lerp(current, target, ease) {
-  return current + (target - current) * ease;
-}
-
-function renderPhoneMotion() {
-  if (heroPhone) {
     heroMotion.scale = lerp(heroMotion.scale, heroMotion.targetScale, 0.12);
     heroMotion.rotateX = lerp(heroMotion.rotateX, heroMotion.targetRotateX, 0.14);
     heroMotion.rotateY = lerp(heroMotion.rotateY, heroMotion.targetRotateY, 0.12);
     heroMotion.twist = lerp(heroMotion.twist, heroMotion.targetTwist, 0.1);
+    heroMotion.uiShiftX = lerp(heroMotion.uiShiftX, heroMotion.targetUiShiftX, 0.12);
+    heroMotion.uiShiftY = lerp(heroMotion.uiShiftY, heroMotion.targetUiShiftY, 0.12);
 
     heroPhone.style.setProperty("--hero-scale", heroMotion.scale.toFixed(3));
     heroPhone.style.setProperty("--tilt-x", heroMotion.rotateX.toFixed(3));
     heroPhone.style.setProperty("--tilt-y", heroMotion.rotateY.toFixed(3));
     heroPhone.style.setProperty("--twist", heroMotion.twist.toFixed(3));
+    heroUi?.style.setProperty("--ui-shift-x", `${heroMotion.uiShiftX.toFixed(2)}px`);
+    heroUi?.style.setProperty("--ui-shift-y", `${heroMotion.uiShiftY.toFixed(2)}px`);
 
-    if (heroUi) {
-      heroMotion.uiShiftX = lerp(heroMotion.uiShiftX, heroMotion.targetUiShiftX, 0.12);
-      heroMotion.uiShiftY = lerp(heroMotion.uiShiftY, heroMotion.targetUiShiftY, 0.12);
-      heroUi.style.setProperty("--ui-shift-x", `${heroMotion.uiShiftX.toFixed(2)}px`);
-      heroUi.style.setProperty("--ui-shift-y", `${heroMotion.uiShiftY.toFixed(2)}px`);
+    if (storyPhone) {
+      storyMotion.scale = lerp(storyMotion.scale, storyMotion.targetScale, 0.12);
+      storyMotion.rotateX = lerp(storyMotion.rotateX, storyMotion.targetRotateX, 0.14);
+      storyMotion.rotateY = lerp(storyMotion.rotateY, storyMotion.targetRotateY, 0.12);
+      storyMotion.twist = lerp(storyMotion.twist, storyMotion.targetTwist, 0.1);
+
+      storyPhone.style.setProperty("--story-scale", storyMotion.scale.toFixed(3));
+      storyPhone.style.setProperty("--story-tilt-x", storyMotion.rotateX.toFixed(3));
+      storyPhone.style.setProperty("--story-tilt-y", storyMotion.rotateY.toFixed(3));
+      storyPhone.style.setProperty("--story-twist", storyMotion.twist.toFixed(3));
+    }
+
+    const heroSettled =
+      Math.abs(heroMotion.scale - heroMotion.targetScale) < 0.001 &&
+      Math.abs(heroMotion.rotateX - heroMotion.targetRotateX) < 0.01 &&
+      Math.abs(heroMotion.rotateY - heroMotion.targetRotateY) < 0.01 &&
+      Math.abs(heroMotion.twist - heroMotion.targetTwist) < 0.01 &&
+      Math.abs(heroMotion.uiShiftX - heroMotion.targetUiShiftX) < 0.01 &&
+      Math.abs(heroMotion.uiShiftY - heroMotion.targetUiShiftY) < 0.01;
+    const storySettled =
+      !storyPhone ||
+      (Math.abs(storyMotion.scale - storyMotion.targetScale) < 0.001 &&
+        Math.abs(storyMotion.rotateX - storyMotion.targetRotateX) < 0.01 &&
+        Math.abs(storyMotion.rotateY - storyMotion.targetRotateY) < 0.01 &&
+        Math.abs(storyMotion.twist - storyMotion.targetTwist) < 0.01);
+
+    if (!heroSettled || !storySettled) {
+      frame = window.requestAnimationFrame(render);
     }
   }
 
-  if (storyPhone) {
-    storyMotion.scale = lerp(storyMotion.scale, storyMotion.targetScale, 0.12);
-    storyMotion.rotateX = lerp(storyMotion.rotateX, storyMotion.targetRotateX, 0.14);
-    storyMotion.rotateY = lerp(storyMotion.rotateY, storyMotion.targetRotateY, 0.12);
-    storyMotion.twist = lerp(storyMotion.twist, storyMotion.targetTwist, 0.1);
-
-    storyPhone.style.setProperty("--story-scale", storyMotion.scale.toFixed(3));
-    storyPhone.style.setProperty("--story-tilt-x", storyMotion.rotateX.toFixed(3));
-    storyPhone.style.setProperty("--story-tilt-y", storyMotion.rotateY.toFixed(3));
-    storyPhone.style.setProperty("--story-twist", storyMotion.twist.toFixed(3));
+  function requestRender() {
+    if (!frame) frame = window.requestAnimationFrame(render);
   }
-}
 
-function handlePointerTilt(scene) {
-  const phone = scene.querySelector("[data-phone]");
-  if (!phone) return;
-
-  scene.addEventListener("mousemove", (event) => {
-    const rect = scene.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-
-    if (phone.classList.contains("hero-phone")) {
-      heroMotion.targetRotateY = x * 20;
-      heroMotion.targetRotateX = -y * 13;
-      heroMotion.targetTwist = x * 4;
-      heroMotion.targetUiShiftX = x * 18;
-      heroMotion.targetUiShiftY = y * 18;
-    } else {
-      storyMotion.targetRotateY = x * 12;
-      storyMotion.targetRotateX = -y * 8;
+  function updateScrollTargets() {
+    const hero = document.getElementById("hero");
+    if (hero) {
+      const heroTop = hero.offsetTop - window.scrollY;
+      const progress = clamp(1 - heroTop / window.innerHeight, 0, 1);
+      heroMotion.targetScale = 0.76 + progress * 0.18;
+      heroMotion.targetRotateY = 12 - progress * 16;
+      heroMotion.targetRotateX = -8 + progress * 10;
+      heroMotion.targetTwist = -6 + progress * 5;
     }
-  });
 
-  scene.addEventListener("mouseleave", () => {
-    if (phone.classList.contains("hero-phone")) {
-      heroMotion.targetUiShiftX = 0;
-      heroMotion.targetUiShiftY = 0;
+    const story = document.querySelector(".story");
+    if (story && desktopStoryQuery.matches) {
+      const sectionTop = story.getBoundingClientRect().top + window.scrollY;
+      const travel = Math.max(story.offsetHeight - window.innerHeight, 1);
+      const progress = clamp((window.scrollY - sectionTop) / travel, 0, 1);
+      storyMotion.targetScale = 0.86 + progress * 0.08;
+      storyMotion.targetRotateY = -10 + progress * 18;
+      storyMotion.targetRotateX = -5 + progress * 8;
+      storyMotion.targetTwist = 4 - progress * 8;
     }
-    updateHeroPhone();
-    updateStoryProgress();
-  });
-}
 
-phoneScenes.forEach(handlePointerTilt);
-
-function updateClock() {
-  const now = new Date();
-  deviceClock.textContent = now.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-}
-
-function handleScroll() {
-  motionState.targetScroll = window.scrollY;
-  if (!motionState.ticking) {
-    motionState.ticking = true;
-    requestAnimationFrame(animateScroll);
+    requestRender();
   }
-}
 
-function animateScroll() {
-  const distance = motionState.targetScroll - motionState.currentScroll;
-  motionState.currentScroll += distance * 0.12;
+  scenes.forEach((scene) => {
+    const phone = scene.querySelector("[data-phone]");
+    if (!phone) return;
 
-  updateHeroPhone();
-  updateStoryProgress();
-  applyScrollDirectionTilt();
-  renderPhoneMotion();
+    scene.addEventListener("pointermove", (event) => {
+      const rect = scene.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      const y = (event.clientY - rect.top) / rect.height - 0.5;
 
-  if (Math.abs(distance) > 0.2) {
-    requestAnimationFrame(animateScroll);
-  } else {
-    motionState.currentScroll = motionState.targetScroll;
-    updateHeroPhone();
-    updateStoryProgress();
-    renderPhoneMotion();
-    motionState.ticking = false;
-  }
-}
-
-window.addEventListener("scroll", handleScroll, { passive: true });
-window.addEventListener("resize", () => {
-  motionState.targetScroll = window.scrollY;
-  motionState.currentScroll = window.scrollY;
-  handleScroll();
-});
-
-ctaForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const email = ctaForm.querySelector("input").value.trim();
-  formStatus.textContent = email
-    ? `You're in, ${email}. We'll share NeuroSync as soon as beta opens.`
-    : "Enter an email if you'd like to join the NeuroSync beta.";
-});
-
-async function loadApkUrl() {
-  const downloadTargets = [
-    downloadAppButton,
-    downloadNavLink,
-    downloadMobileLink,
-  ].filter(Boolean);
-
-  if (!downloadTargets.length) return;
-
-  const apkJsonPaths = ["./public/apk.json", "./apk.json"];
-
-  const setDownloadTargets = (apkUrl) => {
-    if (!apkUrl) return false;
-
-    downloadTargets.forEach((target) => {
-      if (target.tagName === "A") {
-        target.href = apkUrl;
-        target.target = "_blank";
-        target.rel = "noopener noreferrer";
-        target.removeAttribute("aria-disabled");
-        return;
+      if (phone.classList.contains("hero-phone")) {
+        heroMotion.targetRotateY = x * 20;
+        heroMotion.targetRotateX = -y * 13;
+        heroMotion.targetTwist = x * 4;
+        heroMotion.targetUiShiftX = x * 18;
+        heroMotion.targetUiShiftY = y * 18;
+      } else {
+        storyMotion.targetRotateY = x * 12;
+        storyMotion.targetRotateX = -y * 8;
       }
 
-      target.disabled = false;
-      target.addEventListener("click", () => {
-        window.open(apkUrl, "_blank", "noopener,noreferrer");
-      });
+      requestRender();
     });
 
-    return true;
-  };
-
-  for (const path of apkJsonPaths) {
-    try {
-      const response = await fetch(path, { cache: "no-store" });
-      if (!response.ok) continue;
-
-      const data = await response.json();
-      if (setDownloadTargets(data.apkUrl)) return;
-    } catch (error) {
-      // Try the next possible JSON path.
-    }
-  }
-
-  if (downloadAppButton) {
-    downloadAppButton.textContent =
-      window.location.protocol === "file:"
-        ? "Run with a local server to load apk.json"
-        : "App link unavailable";
-  }
-
-  [downloadNavLink, downloadMobileLink].filter(Boolean).forEach((link) => {
-    link.textContent = "Download unavailable";
-    link.removeAttribute("href");
-    link.setAttribute("aria-disabled", "true");
+    scene.addEventListener("pointerleave", () => {
+      heroMotion.targetUiShiftX = 0;
+      heroMotion.targetUiShiftY = 0;
+      updateScrollTargets();
+    });
   });
+
+  window.addEventListener("scroll", updateScrollTargets, { passive: true });
+  window.addEventListener("resize", updateScrollTargets);
+  updateScrollTargets();
 }
 
-// Mobile menu toggle functionality
-const mobileMenuToggle = document.getElementById("mobileMenuToggle");
-const mobileNav = document.getElementById("mobileNav");
-const mobileNavLinks = mobileNav.querySelectorAll("a");
+function restoreDeepLink() {
+  if (!window.location.hash) return;
 
-function closeMobileMenu() {
-  mobileMenuToggle.classList.remove("active");
-  mobileNav.classList.remove("active");
-  mobileMenuToggle.setAttribute("aria-expanded", "false");
+  let targetId;
+  try {
+    targetId = decodeURIComponent(window.location.hash.slice(1));
+  } catch {
+    return;
+  }
+
+  const target = document.getElementById(targetId);
+  if (!target) return;
+
+  const root = document.documentElement;
+  const previousScrollBehavior = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  target.scrollIntoView({ block: "start" });
+  root.style.scrollBehavior = previousScrollBehavior;
 }
 
-mobileMenuToggle.addEventListener("click", () => {
-  mobileMenuToggle.classList.toggle("active");
-  mobileNav.classList.toggle("active");
-  mobileMenuToggle.setAttribute(
-    "aria-expanded",
-    mobileMenuToggle.classList.contains("active")
+setupReveals();
+setupStory();
+setupMobileMenu();
+setupClock();
+setupDownloadMetadata();
+setupCurrentYear();
+setupPhoneMotion();
+
+if (document.readyState === "complete") {
+  window.requestAnimationFrame(restoreDeepLink);
+} else {
+  window.addEventListener(
+    "load",
+    () => window.requestAnimationFrame(restoreDeepLink),
+    { once: true }
   );
-});
-
-// Close mobile menu when a link is clicked
-mobileNavLinks.forEach((link) => {
-  link.addEventListener("click", closeMobileMenu);
-});
-
-// Close mobile menu when clicking outside
-document.addEventListener("click", (event) => {
-  if (
-    !event.target.closest(".site-header") &&
-    mobileNav.classList.contains("active")
-  ) {
-    closeMobileMenu();
-  }
-});
-
-// Close mobile menu on window resize
-window.addEventListener("resize", () => {
-  if (window.innerWidth > 768) {
-    closeMobileMenu();
-  }
-});
-
-updateClock();
-loadApkUrl();
-setInterval(updateClock, 30000);
-setStoryState(0);
-window.scrollTo(0, 0);
-motionState.currentScroll = 0;
-motionState.targetScroll = 0;
-motionState.lastScroll = 0;
-handleScroll();
+}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroSync Support and Release Notes</title>
+  <meta name="description"
+    content="Installation help, Android beta requirements, release notes, and issue reporting for NeuroSync." />
+  <link rel="canonical" href="https://neurosync-website.vercel.app/support.html" />
+  <meta name="theme-color" content="#f6f7fb" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="NeuroSync Support and Release Notes" />
+  <meta property="og:description"
+    content="Installation help, Android beta requirements, release notes, and issue reporting for NeuroSync." />
+  <meta property="og:url" content="https://neurosync-website.vercel.app/support.html" />
+  <meta property="og:image"
+    content="https://neurosync-website.vercel.app/assets/social/neurosync-preview.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="preload" href="./assets/fonts/lexend-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="./legal.css" />
+  <script src="./app.js" defer></script>
+</head>
+
+<body>
+  <a class="skip-link" href="#legal-content">Skip to content</a>
+
+  <header class="legal-header">
+    <a class="legal-brand" href="./index.html">
+      <picture>
+        <source type="image/avif" srcset="./assets/images/logo-96.avif" />
+        <source type="image/webp" srcset="./assets/images/logo-96.webp" />
+        <img src="./logo.png" alt="" width="42" height="42" />
+      </picture>
+      <span>NeuroSync</span>
+    </a>
+    <nav class="legal-nav" aria-label="Support navigation">
+      <a href="./index.html">Home</a>
+      <a href="./privacy.html">Privacy</a>
+      <a href="./terms.html">Terms</a>
+    </nav>
+  </header>
+
+  <main class="legal-main" id="legal-content" tabindex="-1">
+    <h1>Support and release notes.</h1>
+    <p class="legal-intro">
+      Installation help, beta requirements, known limitations, and the best way
+      to report a problem.
+    </p>
+
+    <div class="legal-content">
+      <section id="requirements">
+        <h2>Android beta requirements</h2>
+        <ul>
+          <li>An Android phone or tablet with a current web browser.</li>
+          <li>About 100 MB of free storage for the download and installation.</li>
+          <li>Permission to install an app from your browser.</li>
+        </ul>
+      </section>
+
+      <section id="install">
+        <h2>How to install the beta</h2>
+        <ol>
+          <li>Open the download section on the <a href="./index.html#download">NeuroSync home page</a>.</li>
+          <li>Download the APK on the Android device where you want to use NeuroSync.</li>
+          <li>When Android asks, allow installs from your browser.</li>
+          <li>Open the downloaded file and confirm the installation.</li>
+        </ol>
+      </section>
+
+      <section id="troubleshooting">
+        <h2>If installation fails</h2>
+        <p>
+          Confirm that the download finished, free up storage, and remove any
+          older NeuroSync test build before trying again. Android may show a Play
+          Protect warning because this beta is not distributed through Google
+          Play. Only continue if the APK came from the official NeuroSync site.
+        </p>
+        <p>
+          If the download link has expired, request a fresh beta build through
+          the <a href="https://github.com/SDGP-CS75/NeuroSync-Website/issues/new?title=NeuroSync%20beta%20build%20request"
+            target="_blank" rel="noopener noreferrer">project issue tracker</a>.
+        </p>
+      </section>
+
+      <section id="release">
+        <h2>Current beta release</h2>
+        <ul>
+          <li><strong>Channel:</strong> <span data-download-channel>Android beta</span></li>
+          <li><strong>Build listed:</strong> <span data-download-listed>28 October 2026</span></li>
+          <li><strong>Download size:</strong> <span data-download-size>88.8 MB</span></li>
+          <li><strong>Hosting:</strong> <span data-download-host>Expo EAS</span></li>
+          <li data-download-expiry-row><strong>Listed until:</strong>
+            <span data-download-expiry>11 November 2026</span></li>
+          <li data-download-checksum-row><strong>SHA-256:</strong>
+            <code data-download-checksum>0553af737c193fcea73d9810d21536c88c8be3ad38f686aab0ca4280385b344e</code></li>
+        </ul>
+        <p>
+          This is an early beta. Back up anything important before testing and
+          avoid entering sensitive health information until the app-specific
+          privacy documentation is complete.
+        </p>
+      </section>
+
+      <section id="report">
+        <h2>Report a problem</h2>
+        <p>
+          Open a <a href="https://github.com/SDGP-CS75/NeuroSync-Website/issues/new?title=NeuroSync%20beta%20feedback"
+            data-feedback-link target="_blank" rel="noopener noreferrer">beta feedback issue</a> and include:
+        </p>
+        <ul>
+          <li>Your device model and Android version.</li>
+          <li>The steps that led to the problem.</li>
+          <li>What you expected and what happened instead.</li>
+          <li>A screenshot only if it contains no personal or health information.</li>
+        </ul>
+        <div class="legal-note">
+          <p>
+            GitHub issues are public. Do not include passwords, health records,
+            or other sensitive information. For a privacy question, describe the
+            issue without posting personal data first.
+          </p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="legal-footer">
+    <p>© 2026 NeuroSync.</p>
+    <p>NeuroSync is not medical care or an emergency service.</p>
+  </footer>
+</body>
+
+</html>
