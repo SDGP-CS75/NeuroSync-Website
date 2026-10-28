@@ -2077,7 +2077,7 @@ html.story-enhanced .story {
   }
 
   .site-header {
-    width: min(calc(100% - 24px), var(--max-width));
+    width: min(calc(100% - 32px), var(--max-width));
     margin-top: 12px;
     padding: 12px 14px;
     gap: 0.75rem;
