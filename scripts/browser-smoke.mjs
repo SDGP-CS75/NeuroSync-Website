@@ -176,7 +176,10 @@ async function runViewportChecks(client, origin, { width, height, mobile }) {
     size: document.querySelector("[data-download-size]")?.textContent.trim()
   })`);
   assert(layout.title.includes("NeuroSync"), `${width}px: page title is missing.`);
-  assert(layout.h1?.includes("Focus without pressure."), `${width}px: hero heading is missing.`);
+  assert(
+    layout.h1?.toLowerCase().includes("focus without pressure"),
+    `${width}px: hero heading is missing.`
+  );
   assert(layout.overflow <= 1, `${width}px: horizontal overflow is ${layout.overflow}px.`);
   assert(layout.brokenImages === 0, `${width}px: ${layout.brokenImages} image(s) failed to load.`);
   assert(layout.size === "88.8 MB", `${width}px: APK metadata did not load.`);
@@ -186,7 +189,7 @@ async function runViewportChecks(client, origin, { width, height, mobile }) {
   ].every((link) => link.href.endsWith(".apk"))`);
   assert(downloadLinks, `${width}px: one or more download links are invalid.`);
 
-  if (width < 901) {
+  if (width < 1081) {
     const menuResult = await client.evaluate(`(() => {
       const toggle = document.querySelector("#mobileMenuToggle");
       const nav = document.querySelector("#mobileNav");
@@ -205,15 +208,21 @@ async function runViewportChecks(client, origin, { width, height, mobile }) {
     assert(menuResult.focusReturned, `${width}px: closing the mobile menu did not restore focus.`);
 
     const mobileStory = await client.evaluate(`({
+      stepCount: document.querySelectorAll(".story-step").length,
       visibleSteps: [...document.querySelectorAll(".story-step")].every(
         (step) => getComputedStyle(step).opacity === "1"
       ),
       hiddenStates: [...document.querySelectorAll(".story-step")].filter(
         (step) => step.getAttribute("aria-hidden") === "true"
-      ).length
+      ).length,
+      inlinePhoneVisible: getComputedStyle(document.querySelector(".story-step-phone")).display !== "none",
+      stickyPhoneHidden: getComputedStyle(document.querySelector(".story-phone")).display === "none"
     })`);
+    assert(mobileStory.stepCount === 5, `${width}px: expected five restored story steps.`);
     assert(mobileStory.visibleSteps, `${width}px: mobile story copy is not visible without pinning.`);
     assert(mobileStory.hiddenStates === 0, `${width}px: mobile story copy is incorrectly hidden from assistive tech.`);
+    assert(mobileStory.inlinePhoneVisible, `${width}px: mobile story screenshots are missing.`);
+    assert(mobileStory.stickyPhoneHidden, `${width}px: the pinned phone is still shown on mobile.`);
   }
 }
 
@@ -226,26 +235,59 @@ async function runInteractionChecks(client, origin) {
   });
   await navigate(client, origin);
 
-  const liveStep = await client.evaluate(`(() => {
-    const first = document.querySelector("[data-step-button]");
-    const reset = document.querySelector("[data-reset-step]");
-    const progress = document.querySelector("[data-progress-root]");
-    first.click();
-    const advanced = first.getAttribute("aria-pressed") === "true" && progress.getAttribute("aria-valuenow") === "1";
-    reset.click();
+  const storyGeometry = await client.evaluate(`(() => {
+    const story = document.querySelector(".story");
     return {
-      advanced,
-      reset: progress.getAttribute("aria-valuenow") === "0" && reset.hidden
+      top: story.getBoundingClientRect().top + window.scrollY,
+      height: story.offsetHeight,
+      viewport: window.innerHeight,
+      enhanced: document.documentElement.classList.contains("story-enhanced"),
+      stepCount: document.querySelectorAll(".story-step").length
     };
   })()`);
-  assert(liveStep.advanced, "The hero task interaction did not advance.");
-  assert(liveStep.reset, "The hero task reset did not clear progress.");
+  assert(storyGeometry.enhanced, "The desktop story did not enter its pinned presentation.");
+  assert(storyGeometry.stepCount === 5, "The desktop story is missing one or more steps.");
 
-  await navigate(client, `${origin}/?deep-link-test=1#experience`);
+  const travel = storyGeometry.height - storyGeometry.viewport;
+  const fractions = [0.05, 0.25, 0.45, 0.65, 0.85];
+  for (const [expectedIndex, fraction] of fractions.entries()) {
+    await client.evaluate(`window.scrollTo(0, ${storyGeometry.top + travel * fraction})`);
+    await delay(550);
+
+    const storyState = await client.evaluate(`({
+      activeIndex: [...document.querySelectorAll(".story-step")].findIndex(
+        (step) => step.classList.contains("active")
+      ),
+      hiddenSteps: [...document.querySelectorAll(".story-step")].filter(
+        (step) => step.getAttribute("aria-hidden") === "true"
+      ).length,
+      visibleScreens: [...document.querySelectorAll(".screen-state")].filter(
+        (screen) => screen.classList.contains("is-visible")
+      ).length
+    })`);
+    assert(
+      storyState.activeIndex === expectedIndex,
+      `Desktop story advanced to step ${storyState.activeIndex} instead of ${expectedIndex}.`
+    );
+    assert(storyState.hiddenSteps === 4, "The desktop story exposes more than one step to assistive tech.");
+    assert(storyState.visibleScreens === 1, "The desktop story should show exactly one product screen.");
+  }
+
+  await navigate(client, `${origin}/?deep-link-test=1#story`);
+  await delay(650);
   const deepLinkTop = await client.evaluate(
-    'document.querySelector("#experience").getBoundingClientRect().top'
+    'document.querySelector("#story").getBoundingClientRect().top'
   );
-  assert(deepLinkTop >= 60 && deepLinkTop <= 140, `Deep link landed at ${deepLinkTop}px instead of the section.`);
+  assert(deepLinkTop >= 76 && deepLinkTop <= 148, `Deep link landed at ${deepLinkTop}px instead of the section.`);
+
+  await client.send("Page.reload", { ignoreCache: true });
+  await delay(200);
+  await waitFor(client, 'document.readyState === "complete"', "deep-link reload");
+  await delay(350);
+  const reloadTop = await client.evaluate(
+    'document.querySelector("#story").getBoundingClientRect().top'
+  );
+  assert(reloadTop >= 76 && reloadTop <= 148, `Reloaded deep link landed at ${reloadTop}px.`);
 }
 
 async function runProgressiveEnhancementChecks(client, origin) {
@@ -265,11 +307,15 @@ async function runProgressiveEnhancementChecks(client, origin) {
       (element) => getComputedStyle(element).opacity === "1"
     ),
     storyVisible: [...document.querySelectorAll(".story-step")].every(
-      (step) => step.getAttribute("aria-hidden") === "false" && getComputedStyle(step).opacity === "1"
-    )
+      (step) => step.getAttribute("aria-hidden") !== "true" && getComputedStyle(step).opacity === "1"
+    ),
+    inlinePhoneVisible: getComputedStyle(document.querySelector(".story-step-phone")).display !== "none",
+    stickyPhoneHidden: getComputedStyle(document.querySelector(".story-phone")).display === "none"
   })`);
   assert(reducedMotion.allVisible, "Reduced-motion content is not fully visible.");
   assert(reducedMotion.storyVisible, "Reduced-motion story content is hidden.");
+  assert(reducedMotion.inlinePhoneVisible, "Reduced-motion story screenshots are hidden.");
+  assert(reducedMotion.stickyPhoneHidden, "Reduced motion still uses the pinned story phone.");
 
   await client.send("Emulation.setScriptExecutionDisabled", { value: true });
   await navigate(client, origin);
@@ -277,10 +323,12 @@ async function runProgressiveEnhancementChecks(client, origin) {
     heroVisible: getComputedStyle(document.querySelector(".hero-copy")).opacity === "1",
     storyVisible: [...document.querySelectorAll(".story-step")].every(
       (step) => getComputedStyle(step).opacity === "1"
-    )
+    ),
+    inlinePhoneVisible: getComputedStyle(document.querySelector(".story-step-phone")).display !== "none"
   })`);
   assert(noScript.heroVisible, "Hero content is hidden when JavaScript is unavailable.");
   assert(noScript.storyVisible, "Story content is hidden when JavaScript is unavailable.");
+  assert(noScript.inlinePhoneVisible, "Story screenshots are hidden when JavaScript is unavailable.");
   await client.send("Emulation.setScriptExecutionDisabled", { value: false });
 }
 
