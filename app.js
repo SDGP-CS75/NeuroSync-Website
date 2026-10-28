@@ -7,11 +7,11 @@ const heroPhone = document.querySelector(".hero-phone");
 const storyPhone = document.querySelector(".story-device");
 const heroUi = document.querySelector(".hero-ui");
 const phoneScenes = document.querySelectorAll("[data-phone-scene]");
-const ctaForm = document.querySelector(".cta-form");
-const formStatus = document.getElementById("form-status");
-const downloadAppButton = document.getElementById("download-app-btn");
-const downloadNavLink = document.getElementById("download-nav-link");
-const downloadMobileLink = document.getElementById("download-mobile-link");
+const downloadTargets = document.querySelectorAll("[data-download-link]");
+const downloadSize = document.querySelector("[data-download-size]");
+const downloadChannel = document.querySelector("[data-download-channel]");
+const downloadListed = document.querySelector("[data-download-listed]");
+const downloadAvailability = document.querySelector("[data-download-availability]");
 const deviceClock = document.getElementById("device-clock");
 
 const featureOrder = ["focus", "breakdown", "routine", "mood", "dashboard"];
@@ -279,43 +279,47 @@ window.addEventListener("resize", () => {
   handleScroll();
 });
 
-ctaForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const email = ctaForm.querySelector("input").value.trim();
-  formStatus.textContent = email
-    ? `You're in, ${email}. We'll share NeuroSync as soon as beta opens.`
-    : "Enter an email if you'd like to join the NeuroSync beta.";
-});
-
 async function loadApkUrl() {
-  const downloadTargets = [
-    downloadAppButton,
-    downloadNavLink,
-    downloadMobileLink,
-  ].filter(Boolean);
-
   if (!downloadTargets.length) return;
 
   const apkJsonPaths = ["./public/apk.json", "./apk.json"];
 
-  const setDownloadTargets = (apkUrl) => {
-    if (!apkUrl) return false;
+  const setDownloadTargets = (data) => {
+    if (!data.apkUrl) return false;
 
     downloadTargets.forEach((target) => {
-      if (target.tagName === "A") {
-        target.href = apkUrl;
-        target.target = "_blank";
-        target.rel = "noopener noreferrer";
-        target.removeAttribute("aria-disabled");
-        return;
-      }
-
-      target.disabled = false;
-      target.addEventListener("click", () => {
-        window.open(apkUrl, "_blank", "noopener,noreferrer");
-      });
+      target.href = data.apkUrl;
+      target.target = "_blank";
+      target.rel = "noopener noreferrer";
     });
+
+    if (downloadChannel && data.channel) {
+      downloadChannel.textContent = data.channel;
+    }
+
+    if (downloadSize && Number.isFinite(data.sizeBytes)) {
+      downloadSize.textContent = `${(data.sizeBytes / 1024 / 1024).toFixed(1)} MB`;
+    }
+
+    if (downloadListed && data.listedAt) {
+      downloadListed.textContent = new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }).format(new Date(data.listedAt));
+    }
+
+    if (downloadAvailability && data.expiresAt) {
+      const expiresAt = new Date(data.expiresAt);
+      const isExpired = Date.now() > expiresAt.getTime();
+      downloadAvailability.textContent = isExpired
+        ? "This hosted build may have expired. Download it if it is still available, or request a fresh build in the issue tracker."
+        : `This Expo-hosted beta build is listed until ${new Intl.DateTimeFormat("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }).format(expiresAt)}.`;
+    }
 
     return true;
   };
@@ -326,24 +330,11 @@ async function loadApkUrl() {
       if (!response.ok) continue;
 
       const data = await response.json();
-      if (setDownloadTargets(data.apkUrl)) return;
+      if (setDownloadTargets(data)) return;
     } catch (error) {
       // Try the next possible JSON path.
     }
   }
-
-  if (downloadAppButton) {
-    downloadAppButton.textContent =
-      window.location.protocol === "file:"
-        ? "Run with a local server to load apk.json"
-        : "App link unavailable";
-  }
-
-  [downloadNavLink, downloadMobileLink].filter(Boolean).forEach((link) => {
-    link.textContent = "Download unavailable";
-    link.removeAttribute("href");
-    link.setAttribute("aria-disabled", "true");
-  });
 }
 
 // Mobile menu toggle functionality

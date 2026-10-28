@@ -1,1 +1,8 @@
-{"apkUrl": "https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"}
+{
+  "channel": "Android beta",
+  "apkUrl": "https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk",
+  "sizeBytes": 93131705,
+  "listedAt": "2026-10-28T07:33:41Z",
+  "expiresAt": "2026-11-11T07:33:41Z",
+  "feedbackUrl": "https://github.com/SDGP-CS75/NeuroSync-Website/issues/new?title=NeuroSync%20beta%20feedback"
+}

@@ -40,10 +40,12 @@
       <a href="#problem">Why it helps</a>
       <a href="#story">Experience</a>
       <a href="#difference">Difference</a>
-      <a href="#cta">Join Beta</a>
+      <a href="#download">Android beta</a>
     </nav>
 
-    <a class="nav-cta" id="download-nav-link" href="#" aria-disabled="true">Download</a>
+    <a class="nav-cta" id="download-nav-link" data-download-link
+      href="https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"
+      target="_blank" rel="noopener noreferrer">Download</a>
 
     <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu" aria-expanded="false">
       <span></span>
@@ -55,8 +57,10 @@
       <a href="#problem">Why it helps</a>
       <a href="#story">Experience</a>
       <a href="#difference">Difference</a>
-      <a href="#cta">Join Beta</a>
-      <a href="#" class="mobile-nav-cta" id="download-mobile-link" aria-disabled="true">Download</a>
+      <a href="#download">Android beta</a>
+      <a class="mobile-nav-cta" id="download-mobile-link" data-download-link
+        href="https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"
+        target="_blank" rel="noopener noreferrer">Download</a>
     </nav>
   </header>
 
@@ -70,8 +74,10 @@
           emotion-aware guidance, and one clear next step at a time.
         </p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#cta">Join Beta</a>
-          <a class="button button-secondary" href="#story">See the Experience</a>
+          <a class="button button-primary" data-download-link
+            href="https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"
+            target="_blank" rel="noopener noreferrer">Download for Android</a>
+          <a class="button button-secondary" href="#story">See how it works</a>
         </div>
       </div>
 
@@ -284,7 +290,7 @@
 
         <article class="team-card reveal">
           <div class="team-avatar team-avatar-photo">
-            <img src="./team-sf.jpg" alt="Sansith Fernando" />
+            <img src="./team-sf.jpg" alt="Chamath Silva" />
           </div>
           <div class="team-info">
             <strong>Chamath Silva</strong>
@@ -334,20 +340,49 @@
       </div>
     </section>
 
-    <section class="cta section-shell" id="cta">
-      <div class="cta-card reveal">
-        <p class="eyebrow">Start gently</p>
-        <h2 class="section-title split-text">Build focus. Gently.</h2>
-        <p>
-          Join the NeuroSync beta and experience a productivity system that meets
-          you where you are.
-        </p>
+    <section class="cta section-shell" id="download">
+      <div class="cta-card download-panel reveal">
+        <div class="download-copy">
+          <p class="eyebrow">Android beta</p>
+          <h2 class="section-title split-text">Take NeuroSync with you.</h2>
+          <p>
+            Download the current Android beta directly. Because this is an APK,
+            Android will ask you to allow installs from your browser before the
+            first install.
+          </p>
+          <ol class="install-steps">
+            <li>Download the APK on your Android device.</li>
+            <li>Allow installs from your browser when Android asks.</li>
+            <li>Open the downloaded file and confirm the install.</li>
+          </ol>
+        </div>
 
-        <form class="cta-form">
-          <input type="email" placeholder="Enter your email" aria-label="Email address" />
-          <button class="button button-primary" type="submit">Start Your Journey</button>
-        </form>
-        <p class="form-status" id="form-status" aria-live="polite"></p>
+        <div class="download-meta">
+          <dl>
+            <div>
+              <dt>Channel</dt>
+              <dd data-download-channel>Android beta</dd>
+            </div>
+            <div>
+              <dt>File size</dt>
+              <dd data-download-size>88.8 MB</dd>
+            </div>
+            <div>
+              <dt>Build listed</dt>
+              <dd data-download-listed>28 Oct 2026</dd>
+            </div>
+          </dl>
+          <a class="button button-primary download-button" data-download-link
+            href="https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"
+            target="_blank" rel="noopener noreferrer">Download APK</a>
+          <a class="text-link"
+            href="https://github.com/SDGP-CS75/NeuroSync-Website/issues/new?title=NeuroSync%20beta%20feedback"
+            target="_blank" rel="noopener noreferrer">Report a beta issue</a>
+          <p class="download-availability" data-download-availability>
+            This beta build is hosted by Expo and is available for a limited time.
+            If the link has expired, request a fresh build in the issue tracker.
+          </p>
+        </div>
       </div>
     </section>
   </main>

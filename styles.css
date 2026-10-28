@@ -971,52 +971,76 @@ input {
   line-height: 1.8;
 }
 
-.cta-form {
-  display: flex;
-  gap: 12px;
-  width: min(100%, 520px);
-  margin: 24px auto 0;
+.download-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 48px;
+  width: min(100%, 1040px);
+  padding: 52px;
+  text-align: left;
 }
 
-.cta-form input {
-  flex: 1;
-  min-height: 54px;
-  padding: 0 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(121, 132, 169, 0.16);
-  background: rgba(255, 255, 255, 0.88);
-  color: var(--text);
-  outline: none;
+.download-copy > p:last-of-type {
+  margin-left: 0;
 }
 
-.download-app-button {
+.install-steps {
+  display: grid;
   gap: 10px;
-  margin-top: 16px;
-  border: 1px solid #a97fff;
+  margin: 24px 0 0;
+  padding-left: 20px;
+  color: var(--text);
+  line-height: 1.65;
 }
 
-.download-app-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.download-meta {
+  align-self: center;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.74);
 }
 
-.download-app-icon svg {
-  width: 24px;
-  height: 24px;
-  fill: currentColor;
+.download-meta dl {
+  display: grid;
+  gap: 14px;
+  margin: 0 0 24px;
 }
 
-.download-app-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.download-meta dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.form-status {
-  min-height: 24px;
-  margin-top: 12px;
+.download-meta dt {
+  color: var(--muted);
+}
+
+.download-meta dd {
+  margin: 0;
   font-weight: 600;
-  color: var(--accent-strong);
+  text-align: right;
+}
+
+.download-button {
+  width: 100%;
+}
+
+.text-link {
+  display: inline-flex;
+  margin-top: 16px;
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.download-availability {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
 }
 
 .reveal {
@@ -1226,10 +1250,8 @@ input {
   }
 
   .mini-grid,
-  .dashboard-cards,
-  .cta-form {
+  .dashboard-cards {
     grid-template-columns: 1fr;
-    flex-direction: column;
   }
 
   .story-copy {
@@ -1463,14 +1485,10 @@ input {
     padding: 2rem 1.5rem;
   }
 
-  .cta-form {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-  }
-
-  .cta-form input[type="email"] {
-    width: 100%;
+  .download-panel {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 1.5rem 1.25rem;
   }
 }
 
