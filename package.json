@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node scripts/serve.mjs 3000",
     "build": "echo 'Static site - no build required'",
+    "build:story-images": "bash scripts/build-story-images.sh",
     "start": "node scripts/serve.mjs 3000",
     "check:site": "node scripts/check-site.mjs",
     "check:download": "node scripts/check-download.mjs",
