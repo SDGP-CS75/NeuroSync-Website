@@ -33,7 +33,7 @@ including clean 404 responses, without installing a separate static-site tool.
 # HTML, links, anchors, metadata, APK metadata, icons, sitemap, and headers
 npm run check:site
 
-# Responsive layout, keyboard menu, live task, download, deep links,
+# Responsive layout, keyboard menu, five-step story, download, deep links,
 # reduced motion, no-JavaScript fallback, and browser console errors
 npm run test:browser
 
