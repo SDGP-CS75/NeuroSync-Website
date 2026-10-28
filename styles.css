@@ -180,8 +180,7 @@ input {
 .problem-card p,
 .story-step p,
 .compare-list,
-.cta-card p,
-.card-label {
+.cta-card p {
   color: var(--muted);
 }
 
@@ -263,9 +262,7 @@ input {
 }
 
 .headline,
-.section-title,
-.hero-card h2,
-.screen-panel h3 {
+.section-title {
   margin: 0;
   font-weight: 700;
   letter-spacing: -0.05em;
@@ -521,8 +518,7 @@ input {
   50% { transform: translate3d(calc(var(--ui-shift-x) * 1.5), calc(var(--ui-shift-y) * 1.5 - 8px), 0) scale(1.03); }
 }
 
-.status-row,
-.card-topline {
+.status-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -533,121 +529,6 @@ input {
   font-size: 0.92rem;
   color: #49536c;
   margin-bottom: 24px;
-}
-
-.hero-card,
-.mini-card,
-.progress-card,
-.screen-panel {
-  border: 1px solid rgba(255, 255, 255, 0.88);
-  background: var(--surface);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: var(--shadow-md);
-}
-
-.hero-card {
-  padding: 22px;
-  border-radius: 28px;
-  animation: heroCardFloat 6.5s ease-in-out infinite;
-  transform-origin: center;
-}
-
-.chip {
-  display: inline-flex;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.74);
-  color: #586480;
-  font-size: 0.84rem;
-  font-weight: 600;
-}
-
-.hero-card h2 {
-  margin-top: 14px;
-  font-size: 2.1rem;
-}
-
-.hero-card p {
-  margin-top: 12px;
-  color: var(--muted);
-  line-height: 1.7;
-}
-
-.mini-grid,
-.dashboard-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 12px;
-}
-
-.mini-card,
-.progress-card,
-.screen-panel {
-  padding: 16px;
-  border-radius: 24px;
-}
-
-.hero-ui .mini-card:nth-child(1) {
-  animation: cardDriftLeft 7s ease-in-out infinite;
-}
-
-.hero-ui .mini-card:nth-child(2) {
-  animation: cardDriftRight 7.8s ease-in-out infinite;
-}
-
-.mini-card strong,
-.screen-panel h3,
-.screen-panel strong {
-  display: block;
-  margin-top: 10px;
-}
-
-.mini-card p {
-  margin: 8px 0 0;
-  color: var(--muted-soft);
-  font-size: 0.92rem;
-}
-
-.progress-card {
-  margin-top: 12px;
-  animation: progressCardFloat 7.2s ease-in-out infinite;
-}
-
-.track {
-  width: 100%;
-  height: 10px;
-  margin-top: 14px;
-  border-radius: 999px;
-  overflow: hidden;
-  background: rgba(114, 127, 183, 0.12);
-}
-
-.track span {
-  display: block;
-  width: var(--fill);
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #7c9aff, #8e81ff);
-}
-
-.hero-ui .track {
-  position: relative;
-}
-
-.hero-ui .track span {
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-ui .track span::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.34), transparent);
-  transform: translateX(-120%);
-  animation: progressSweep 3.8s ease-in-out infinite;
 }
 
 .problem {
@@ -778,66 +659,6 @@ input {
 .screen-state.is-visible {
   opacity: 1;
   transform: translateY(0) scale(1);
-}
-
-.screen-panel.large {
-  margin-top: 8px;
-  min-height: 220px;
-}
-
-.screen-panel h3 {
-  font-size: 1.8rem;
-  letter-spacing: -0.04em;
-}
-
-.screen-panel p {
-  margin: 10px 0 0;
-  color: var(--muted);
-  line-height: 1.75;
-}
-
-.screen-list {
-  margin: 12px 0 0;
-  padding-left: 18px;
-  color: var(--muted);
-  line-height: 1.85;
-}
-
-.routine-stack,
-.mood-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.routine-stack {
-  flex-wrap: wrap;
-}
-
-.routine-stack span {
-  padding: 12px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
-  color: #55607c;
-  font-size: 0.92rem;
-  box-shadow: 0 14px 30px rgba(122, 136, 178, 0.12);
-}
-
-.mood-row span {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.74);
-  box-shadow: 0 10px 28px rgba(122, 136, 178, 0.1);
-}
-
-.mood-row span.active {
-  background: linear-gradient(135deg, #7c9aff, #8e81ff);
-}
-
-.screen-panel.compact strong {
-  font-size: 1rem;
-  line-height: 1.5;
 }
 
 .emotion {
@@ -976,52 +797,15 @@ input {
   line-height: 1.8;
 }
 
-.cta-form {
-  display: flex;
-  gap: 12px;
-  width: min(100%, 520px);
-  margin: 24px auto 0;
-}
-
-.cta-form input {
-  flex: 1;
-  min-height: 54px;
-  padding: 0 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(121, 132, 169, 0.16);
-  background: rgba(255, 255, 255, 0.88);
-  color: var(--text);
-  outline: none;
-}
-
 .download-app-button {
   gap: 10px;
   margin-top: 16px;
   border: 1px solid #a97fff;
 }
 
-.download-app-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.download-app-icon svg {
-  width: 24px;
-  height: 24px;
-  fill: currentColor;
-}
-
 .download-app-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.form-status {
-  min-height: 24px;
-  margin-top: 12px;
-  font-weight: 600;
-  color: var(--accent-strong);
 }
 
 .reveal {
@@ -1035,23 +819,6 @@ input {
   transform: translateY(0);
 }
 
-.split-char {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(26px);
-  transition: opacity 520ms ease, transform 520ms ease;
-}
-
-.split-text.is-visible .split-char {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.split-space {
-  display: inline-block;
-  width: 0.34em;
-}
-
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -1060,47 +827,6 @@ input {
 @keyframes heroUiBreathe {
   0%, 100% { transform: translate3d(calc(var(--ui-shift-x) * 0.6), calc(var(--ui-shift-y) * 0.6), 0); }
   50% { transform: translate3d(calc(var(--ui-shift-x) * 0.6), calc(var(--ui-shift-y) * 0.6 - 4px), 0); }
-}
-
-@keyframes heroCardFloat {
-  0%, 100% {
-    transform: translate3d(calc(var(--ui-shift-x) * 0.45), calc(var(--ui-shift-y) * 0.45), 0) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(calc(var(--ui-shift-x) * 0.45), calc(var(--ui-shift-y) * 0.45 - 6px), 0) rotate(-0.35deg);
-  }
-}
-
-@keyframes cardDriftLeft {
-  0%, 100% {
-    transform: translate3d(calc(var(--ui-shift-x) * -0.28), calc(var(--ui-shift-y) * -0.28), 0);
-  }
-  50% {
-    transform: translate3d(calc(var(--ui-shift-x) * -0.28 - 4px), calc(var(--ui-shift-y) * -0.28 - 5px), 0);
-  }
-}
-
-@keyframes cardDriftRight {
-  0%, 100% {
-    transform: translate3d(calc(var(--ui-shift-x) * 0.28), calc(var(--ui-shift-y) * 0.28), 0);
-  }
-  50% {
-    transform: translate3d(calc(var(--ui-shift-x) * 0.28 + 4px), calc(var(--ui-shift-y) * 0.28 - 4px), 0);
-  }
-}
-
-@keyframes progressCardFloat {
-  0%, 100% {
-    transform: translate3d(calc(var(--ui-shift-x) * 0.18), calc(var(--ui-shift-y) * 0.18), 0);
-  }
-  50% {
-    transform: translate3d(calc(var(--ui-shift-x) * 0.18), calc(var(--ui-shift-y) * 0.18 - 5px), 0);
-  }
-}
-
-@keyframes progressSweep {
-  0%, 100% { transform: translateX(-120%); }
-  55% { transform: translateX(140%); }
 }
 
 @media (max-width: 1080px) {
@@ -1228,13 +954,6 @@ input {
   .cta-card,
   .emotion-card {
     padding: 20px;
-  }
-
-  .mini-grid,
-  .dashboard-cards,
-  .cta-form {
-    grid-template-columns: 1fr;
-    flex-direction: column;
   }
 
   .story-copy {
@@ -1448,15 +1167,20 @@ input {
 
   .team-card {
     max-width: 100%;
-    flex-direction: column;
+    min-height: 116px;
+    flex-direction: row;
     align-items: center;
-    text-align: center;
-    padding: 1.5rem;
+    gap: 16px;
+    padding: 10px 18px 10px 10px;
+    text-align: left;
+    border-radius: 24px;
   }
 
   .team-avatar {
+    width: 96px;
+    height: 96px;
     margin-right: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
   }
 
   .team-avatar img,
@@ -1476,15 +1200,6 @@ input {
     padding: 2rem 1.5rem;
   }
 
-  .cta-form {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-  }
-
-  .cta-form input[type="email"] {
-    width: 100%;
-  }
 }
 
 @media (max-width: 480px) {
@@ -1956,7 +1671,7 @@ html.story-enhanced .story {
 
 .download-meta {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
   gap: 12px;
   width: min(100%, 760px);
   margin: 28px auto;
@@ -1983,6 +1698,14 @@ html.story-enhanced .story {
   color: var(--text);
   font-size: 0.92rem;
   font-weight: 600;
+}
+
+.download-meta dd code {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .download-card .download-app-button {
@@ -2138,12 +1861,12 @@ html.story-enhanced .story {
   }
 
   .team-card {
-    padding: 24px;
+    padding: 10px 18px 10px 10px;
   }
 
   .team-avatar {
-    width: 132px;
-    height: 132px;
+    width: 96px;
+    height: 96px;
   }
 
   .download-card {
@@ -2218,6 +1941,56 @@ html.story-enhanced .story {
 
   .download-card {
     padding: 28px 20px;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 1080px) {
+  .team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1080px) {
+  .no-js .site-header {
+    flex-wrap: wrap;
+  }
+
+  .no-js .mobile-menu-toggle {
+    display: none;
+  }
+
+  .no-js .mobile-nav {
+    position: static;
+    display: flex;
+    flex: 1 0 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    max-height: none;
+    margin-top: 4px;
+    padding: 8px 0 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    animation: none;
+  }
+
+  .no-js .mobile-nav a {
+    flex: 1 1 auto;
+    padding: 0.65rem 0.5rem;
+    border-bottom: 0;
+    text-align: center;
+  }
+
+  .no-js .mobile-nav-cta {
+    flex: 1 1 100%;
+    margin: 4px 0 0;
+  }
+
+  .no-js .hero {
+    padding-top: 240px;
   }
 }
 

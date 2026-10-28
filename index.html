@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 
 <head>
   <meta charset="UTF-8" />
@@ -83,7 +83,7 @@
       <span aria-hidden="true"></span>
     </button>
 
-    <nav class="mobile-nav" id="mobileNav" aria-label="Mobile" aria-hidden="true">
+    <nav class="mobile-nav" id="mobileNav" aria-label="Mobile" aria-hidden="false">
       <a href="#problem">Why it helps</a>
       <a href="#story">Experience</a>
       <a href="#difference">Difference</a>
@@ -620,6 +620,18 @@
             <dt>Build listed</dt>
             <dd data-download-listed>28 Oct 2026</dd>
           </div>
+          <div>
+            <dt>Hosted by</dt>
+            <dd data-download-host>Expo EAS</dd>
+          </div>
+          <div data-download-expiry-row>
+            <dt>Listed until</dt>
+            <dd data-download-expiry>11 Nov 2026</dd>
+          </div>
+          <div data-download-checksum-row>
+            <dt>SHA-256</dt>
+            <dd><code data-download-checksum>0553af737c193fcea73d9810d21536c88c8be3ad38f686aab0ca4280385b344e</code></dd>
+          </div>
         </dl>
 
         <a class="button button-primary download-app-button" data-download-link
@@ -627,7 +639,7 @@
           target="_blank" rel="noopener noreferrer">Download APK</a>
         <div class="download-links">
           <a href="https://github.com/SDGP-CS75/NeuroSync-Website/issues/new?title=NeuroSync%20beta%20feedback"
-            target="_blank" rel="noopener noreferrer">Report a beta issue</a>
+            data-feedback-link target="_blank" rel="noopener noreferrer">Report a beta issue</a>
           <a href="./support.html#release">Release notes and support</a>
         </div>
         <p class="download-availability" data-download-availability>

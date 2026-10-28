@@ -74,12 +74,22 @@ so the project includes both a visible expiry notice and an automated monitor.
    ```json
    {
      "channel": "Android beta",
+     "hosting": "GitHub Releases",
      "apkUrl": "https://github.com/ORG/REPO/releases/download/TAG/neurosync.apk",
      "sizeBytes": 93131705,
      "listedAt": "2026-10-28T07:33:41Z",
-     "expiresAt": "2027-10-28T07:33:41Z",
      "feedbackUrl": "https://github.com/SDGP-CS75/NeuroSync-Website/issues/new?title=NeuroSync%20beta%20feedback"
    }
+   ```
+
+   `expiresAt` is optional. Include it only when the host actually expires the
+   artifact; omit it for a durable GitHub Release or equivalent host. Add
+   `sha256` with the verified 64-character checksum when one is available.
+
+   Compute the checksum from the exact file uploaded to the host:
+
+   ```bash
+   shasum -a 256 path/to/neurosync.apk
    ```
 
 4. Update the static fallback values and release list in `index.html` and
@@ -95,9 +105,9 @@ so the project includes both a visible expiry notice and an automated monitor.
    `master`.
 
 The scheduled `Beta download check` workflow makes a one-byte range request,
-compares the host's byte size with `sizeBytes`, and fails when `expiresAt` has
-passed. A failed scheduled workflow is the signal to publish a replacement
-build before users encounter a dead link.
+compares the host's byte size with `sizeBytes`, and fails when an `expiresAt`
+value is present and has passed. A failed scheduled workflow is the signal to
+publish a replacement build before users encounter a dead link.
 
 ## Pre-merge checklist
 
@@ -125,7 +135,9 @@ files.
 
 Run `npm run check:download`. If the Expo artifact expired, publish a new APK,
 update `public/apk.json` and the support page, then repeat the release
-procedure. Never point users to an unverified mirror.
+procedure. For the current 11 November 2026 deadline, move the APK to a GitHub
+Release asset or another durable HTTPS host instead of rebuilding only another
+temporary EAS artifact. Never point users to an unverified mirror.
 
 ### Browser tests cannot find Chrome
 

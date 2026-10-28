@@ -22,6 +22,7 @@
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="preload" href="./assets/fonts/lexend-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="./legal.css" />
+  <script src="./app.js" defer></script>
 </head>
 
 <body>
@@ -88,11 +89,14 @@
       <section id="release">
         <h2>Current beta release</h2>
         <ul>
-          <li><strong>Channel:</strong> Android beta</li>
-          <li><strong>Build listed:</strong> 28 October 2026</li>
-          <li><strong>Download size:</strong> 88.8 MB</li>
-          <li><strong>Hosting:</strong> Expo EAS artifact storage</li>
-          <li><strong>Listed until:</strong> 11 November 2026</li>
+          <li><strong>Channel:</strong> <span data-download-channel>Android beta</span></li>
+          <li><strong>Build listed:</strong> <span data-download-listed>28 October 2026</span></li>
+          <li><strong>Download size:</strong> <span data-download-size>88.8 MB</span></li>
+          <li><strong>Hosting:</strong> <span data-download-host>Expo EAS</span></li>
+          <li data-download-expiry-row><strong>Listed until:</strong>
+            <span data-download-expiry>11 November 2026</span></li>
+          <li data-download-checksum-row><strong>SHA-256:</strong>
+            <code data-download-checksum>0553af737c193fcea73d9810d21536c88c8be3ad38f686aab0ca4280385b344e</code></li>
         </ul>
         <p>
           This is an early beta. Back up anything important before testing and
@@ -105,7 +109,7 @@
         <h2>Report a problem</h2>
         <p>
           Open a <a href="https://github.com/SDGP-CS75/NeuroSync-Website/issues/new?title=NeuroSync%20beta%20feedback"
-            target="_blank" rel="noopener noreferrer">beta feedback issue</a> and include:
+            data-feedback-link target="_blank" rel="noopener noreferrer">beta feedback issue</a> and include:
         </p>
         <ul>
           <li>Your device model and Android version.</li>

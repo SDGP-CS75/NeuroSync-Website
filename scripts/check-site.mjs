@@ -192,12 +192,18 @@ check(/<meta\s+property="og:image"\s+content="https:\/\/neurosync-website\.verce
 check(/<meta\s+name="twitter:card"\s+content="summary_large_image"/i.test(indexHtml), "The landing page is missing its Twitter card.");
 check(/<link\s+rel="manifest"\s+href="\.\/manifest\.webmanifest"/i.test(indexHtml), "The landing page is missing its web manifest.");
 check(/<script\s+src="\.\/app\.js"\s+defer><\/script>/i.test(indexHtml), "The landing page must load app.js with defer.");
+check(/<html\s+lang="en"\s+class="no-js"/i.test(indexHtml), "The landing page must start in no-JS mode.");
+check(
+  /<nav\s+class="mobile-nav"[^>]*aria-hidden="false"/i.test(indexHtml),
+  "The mobile navigation must remain available when JavaScript is unavailable."
+);
 check(!/<form\b/i.test(indexHtml), "The landing page should not reintroduce a non-functional form.");
 check(!/href="#"/i.test(indexHtml), "The landing page contains an empty placeholder link.");
 
 const manifest = await readJson("manifest.webmanifest");
 check(Boolean(manifest.name && manifest.short_name && manifest.start_url), "The manifest is missing required identity fields.");
 check(manifest.icons?.length >= 2, "The manifest needs at least two icons.");
+check(manifest.theme_color === "#f5f7fb", "The manifest theme color must match the landing page.");
 for (const icon of manifest.icons || []) {
   const iconPath = path.join(root, icon.src.replace(/^\/+/, ""));
   check(await exists(iconPath), `Manifest icon is missing: ${icon.src}`);
@@ -221,22 +227,39 @@ check(
 );
 
 const apk = await readJson("public/apk.json");
-for (const field of ["channel", "apkUrl", "sizeBytes", "listedAt", "expiresAt", "feedbackUrl"]) {
+for (const field of ["channel", "hosting", "apkUrl", "sizeBytes", "listedAt", "feedbackUrl"]) {
   check(Boolean(apk[field]), `public/apk.json is missing ${field}.`);
 }
 check(Number.isFinite(apk.sizeBytes) && apk.sizeBytes > 0, "APK size must be a positive number.");
 check(new URL(apk.apkUrl).protocol === "https:", "The APK URL must use HTTPS.");
 check(new URL(apk.feedbackUrl).protocol === "https:", "The feedback URL must use HTTPS.");
 const listedAt = new Date(apk.listedAt);
-const expiresAt = new Date(apk.expiresAt);
 check(Number.isFinite(listedAt.getTime()), "APK listedAt must be a valid date.");
-check(Number.isFinite(expiresAt.getTime()), "APK expiresAt must be a valid date.");
-check(expiresAt > listedAt, "APK expiresAt must be later than listedAt.");
-check(expiresAt > new Date(), "The hosted APK has expired; publish a fresh beta build.");
+if (apk.expiresAt !== undefined) {
+  const expiresAt = new Date(apk.expiresAt);
+  check(Number.isFinite(expiresAt.getTime()), "APK expiresAt must be a valid date.");
+  check(expiresAt > listedAt, "APK expiresAt must be later than listedAt.");
+  check(expiresAt > new Date(), "The hosted APK has expired; publish a fresh beta build.");
+}
+if (apk.sha256 !== undefined) {
+  check(
+    typeof apk.sha256 === "string" && /^[a-f0-9]{64}$/i.test(apk.sha256),
+    "APK sha256 must be a 64-character hexadecimal checksum."
+  );
+}
 
 for (const match of indexHtml.matchAll(/<a\b[^>]*data-download-link[^>]*>/gi)) {
   const attributes = parseAttributes(match[0]);
   check(attributes.href === apk.apkUrl, "A download link is out of sync with public/apk.json.");
+}
+for (const [relativePath, html] of htmlByPath) {
+  for (const match of html.matchAll(/<a\b[^>]*data-feedback-link[^>]*>/gi)) {
+    const attributes = parseAttributes(match[0]);
+    check(
+      attributes.href === apk.feedbackUrl,
+      `${relativePath} has a feedback link out of sync with public/apk.json.`
+    );
+  }
 }
 
 const sitemap = await readFile(path.join(root, "sitemap.xml"), "utf8");

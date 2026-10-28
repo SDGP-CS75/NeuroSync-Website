@@ -1,3 +1,4 @@
+document.documentElement.classList.remove("no-js");
 document.documentElement.classList.add("js");
 
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -145,11 +146,14 @@ function setupMobileMenu() {
     toggle.setAttribute("aria-expanded", String(open));
     toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
     mobileNav.setAttribute("aria-hidden", String(!open));
+    mobileNav.toggleAttribute("inert", !open);
 
     if (returnFocus || (!open && focusWasInside)) {
       toggle.focus();
     }
   }
+
+  setMenu(false);
 
   toggle.addEventListener("click", () => {
     setMenu(!mobileNav.classList.contains("active"));
@@ -160,7 +164,7 @@ function setupMobileMenu() {
   });
 
   document.addEventListener("click", (event) => {
-    if (!event.target.closest(".site-header")) {
+    if (!(event.target instanceof Element) || !event.target.closest(".site-header")) {
       setMenu(false);
     }
   });
@@ -168,6 +172,23 @@ function setupMobileMenu() {
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && mobileNav.classList.contains("active")) {
       setMenu(false, true);
+      return;
+    }
+
+    if (event.key !== "Tab" || !mobileNav.classList.contains("active")) {
+      return;
+    }
+
+    const focusable = [toggle, ...links];
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
     }
   });
 
@@ -198,18 +219,41 @@ function setupClock() {
 
 function setupDownloadMetadata() {
   const downloadTargets = [...document.querySelectorAll("[data-download-link]")];
+  const feedbackTargets = [...document.querySelectorAll("[data-feedback-link]")];
   const downloadSizes = [...document.querySelectorAll("[data-download-size]")];
   const downloadChannel = document.querySelector("[data-download-channel]");
+  const downloadHost = document.querySelector("[data-download-host]");
   const downloadListed = document.querySelector("[data-download-listed]");
+  const downloadExpiry = document.querySelector("[data-download-expiry]");
+  const downloadExpiryRow = document.querySelector("[data-download-expiry-row]");
+  const downloadChecksum = document.querySelector("[data-download-checksum]");
+  const downloadChecksumRow = document.querySelector("[data-download-checksum-row]");
   const downloadAvailability = document.querySelector("[data-download-availability]");
 
-  if (!downloadTargets.length) return;
+  const metadataElements = [
+    ...downloadTargets,
+    ...feedbackTargets,
+    ...downloadSizes,
+    downloadChannel,
+    downloadHost,
+    downloadListed,
+    downloadExpiry,
+    downloadChecksum,
+    downloadAvailability,
+  ].filter(Boolean);
+
+  if (!metadataElements.length) return;
 
   const dateFormatter = new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
+
+  function formatDate(value) {
+    const date = new Date(value);
+    return Number.isFinite(date.getTime()) ? dateFormatter.format(date) : null;
+  }
 
   function applyMetadata(data) {
     if (!data.apkUrl) return false;
@@ -220,8 +264,18 @@ function setupDownloadMetadata() {
       target.rel = "noopener noreferrer";
     });
 
+    if (data.feedbackUrl) {
+      feedbackTargets.forEach((target) => {
+        target.href = data.feedbackUrl;
+      });
+    }
+
     if (downloadChannel && data.channel) {
       downloadChannel.textContent = data.channel;
+    }
+
+    if (downloadHost && data.hosting) {
+      downloadHost.textContent = data.hosting;
     }
 
     if (Number.isFinite(data.sizeBytes)) {
@@ -232,15 +286,38 @@ function setupDownloadMetadata() {
     }
 
     if (downloadListed && data.listedAt) {
-      downloadListed.textContent = dateFormatter.format(new Date(data.listedAt));
+      const listedDate = formatDate(data.listedAt);
+      if (listedDate) downloadListed.textContent = listedDate;
     }
 
-    if (downloadAvailability && data.expiresAt) {
-      const expiresAt = new Date(data.expiresAt);
-      downloadAvailability.textContent =
-        Date.now() > expiresAt.getTime()
-          ? "This hosted build may have expired. Download it if it is still available, or request a fresh build in the issue tracker."
-          : `This Expo-hosted beta build is listed until ${dateFormatter.format(expiresAt)}.`;
+    const expiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
+    const hasValidExpiry = expiresAt && Number.isFinite(expiresAt.getTime());
+
+    if (downloadExpiry && hasValidExpiry) {
+      downloadExpiry.textContent = dateFormatter.format(expiresAt);
+    }
+    if (downloadExpiryRow) {
+      downloadExpiryRow.hidden = !hasValidExpiry;
+    }
+
+    if (downloadChecksum && data.sha256) {
+      downloadChecksum.textContent = data.sha256;
+    }
+    if (downloadChecksumRow) {
+      downloadChecksumRow.hidden = !data.sha256;
+    }
+
+    if (downloadAvailability) {
+      const hosting = data.hosting || "The current download host";
+      if (hasValidExpiry) {
+        downloadAvailability.textContent =
+          Date.now() > expiresAt.getTime()
+            ? `${hosting} listed this build until ${dateFormatter.format(expiresAt)}. It may no longer be available; request a fresh build in the issue tracker if the download fails.`
+            : `${hosting} lists this beta build until ${dateFormatter.format(expiresAt)}.`;
+      } else {
+        downloadAvailability.textContent =
+          `${hosting} hosts this build. No expiry date is listed in the site metadata; verify availability before sharing the link.`;
+      }
     }
 
     return true;

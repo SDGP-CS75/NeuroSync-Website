@@ -5,6 +5,11 @@ import os from "node:os";
 import path from "node:path";
 import { startStaticServer } from "./lib/static-server.mjs";
 
+const downloadMetadata = JSON.parse(
+  await readFile(new URL("../public/apk.json", import.meta.url), "utf8")
+);
+const expectedSizeLabel = `${(downloadMetadata.sizeBytes / 1024 / 1024).toFixed(1)} MB`;
+
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 function reportFatalError(error) {
@@ -173,7 +178,10 @@ async function runViewportChecks(client, origin, { width, height, mobile }) {
     brokenImages: [...document.images].filter(
       (image) => image.complete && image.naturalWidth === 0
     ).length,
-    size: document.querySelector("[data-download-size]")?.textContent.trim()
+    size: document.querySelector("[data-download-size]")?.textContent.trim(),
+    host: document.querySelector("[data-download-host]")?.textContent.trim(),
+    availability: document.querySelector("[data-download-availability]")?.textContent.trim(),
+    checksum: document.querySelector("[data-download-checksum]")?.textContent.trim()
   })`);
   assert(layout.title.includes("NeuroSync"), `${width}px: page title is missing.`);
   assert(
@@ -182,7 +190,19 @@ async function runViewportChecks(client, origin, { width, height, mobile }) {
   );
   assert(layout.overflow <= 1, `${width}px: horizontal overflow is ${layout.overflow}px.`);
   assert(layout.brokenImages === 0, `${width}px: ${layout.brokenImages} image(s) failed to load.`);
-  assert(layout.size === "88.8 MB", `${width}px: APK metadata did not load.`);
+  assert(layout.size === expectedSizeLabel, `${width}px: APK size metadata did not load.`);
+  assert(
+    layout.host === downloadMetadata.hosting,
+    `${width}px: APK hosting metadata did not load.`
+  );
+  assert(
+    layout.availability?.includes(downloadMetadata.hosting),
+    `${width}px: APK availability copy does not identify the host.`
+  );
+  assert(
+    layout.checksum === downloadMetadata.sha256,
+    `${width}px: APK checksum metadata did not load.`
+  );
 
   await client.evaluate(
     'document.querySelector(".story-step-phone").scrollIntoView({ block: "center" })'
@@ -214,14 +234,29 @@ async function runViewportChecks(client, origin, { width, height, mobile }) {
       toggle.focus();
       toggle.click();
       const opened = toggle.getAttribute("aria-expanded") === "true" && nav.classList.contains("active");
+      const lastLink = nav.querySelector("a:last-child");
+      lastLink.focus();
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+      const tabWraps = document.activeElement === toggle;
+      toggle.focus();
+      document.dispatchEvent(new KeyboardEvent("keydown", {
+        key: "Tab",
+        shiftKey: true,
+        bubbles: true
+      }));
+      const shiftTabWraps = document.activeElement === lastLink;
       document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
       return {
         opened,
+        tabWraps,
+        shiftTabWraps,
         closed: toggle.getAttribute("aria-expanded") === "false" && !nav.classList.contains("active"),
         focusReturned: document.activeElement === toggle
       };
     })()`);
     assert(menuResult.opened, `${width}px: mobile menu did not open.`);
+    assert(menuResult.tabWraps, `${width}px: Tab did not wrap inside the mobile menu.`);
+    assert(menuResult.shiftTabWraps, `${width}px: Shift+Tab did not wrap inside the mobile menu.`);
     assert(menuResult.closed, `${width}px: Escape did not close the mobile menu.`);
     assert(menuResult.focusReturned, `${width}px: closing the mobile menu did not restore focus.`);
 
@@ -354,15 +389,25 @@ async function runProgressiveEnhancementChecks(client, origin) {
   await client.send("Emulation.setScriptExecutionDisabled", { value: true });
   await navigate(client, origin);
   const noScript = await client.evaluate(`({
+    htmlClass: document.documentElement.className,
     heroVisible: getComputedStyle(document.querySelector(".hero-copy")).opacity === "1",
     storyVisible: [...document.querySelectorAll(".story-step")].every(
       (step) => getComputedStyle(step).opacity === "1"
     ),
-    inlinePhoneVisible: getComputedStyle(document.querySelector(".story-step-phone")).display !== "none"
+    inlinePhoneVisible: getComputedStyle(document.querySelector(".story-step-phone")).display !== "none",
+    mobileNavDisplay: getComputedStyle(document.querySelector("#mobileNav")).display,
+    mobileNavHidden: document.querySelector("#mobileNav").getAttribute("aria-hidden"),
+    mobileNavLinks: document.querySelectorAll("#mobileNav a").length,
+    toggleDisplay: getComputedStyle(document.querySelector("#mobileMenuToggle")).display
   })`);
+  assert(noScript.htmlClass.includes("no-js"), "No-JS mode lost its no-js class.");
   assert(noScript.heroVisible, "Hero content is hidden when JavaScript is unavailable.");
   assert(noScript.storyVisible, "Story content is hidden when JavaScript is unavailable.");
   assert(noScript.inlinePhoneVisible, "Story screenshots are hidden when JavaScript is unavailable.");
+  assert(noScript.mobileNavDisplay === "flex", "Mobile navigation is hidden when JavaScript is unavailable.");
+  assert(noScript.mobileNavHidden === "false", "No-JS mobile navigation is hidden from assistive technology.");
+  assert(noScript.mobileNavLinks === 5, "No-JS mobile navigation is missing links.");
+  assert(noScript.toggleDisplay === "none", "The mobile menu toggle is shown without JavaScript.");
   await client.send("Emulation.setScriptExecutionDisabled", { value: false });
 }
 

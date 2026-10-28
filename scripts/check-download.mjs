@@ -1,16 +1,20 @@
 import { readFile } from "node:fs/promises";
 
 const metadata = JSON.parse(await readFile(new URL("../public/apk.json", import.meta.url), "utf8"));
-const expiresAt = new Date(metadata.expiresAt);
+const expiresAt = metadata.expiresAt ? new Date(metadata.expiresAt) : null;
 
-if (!Number.isFinite(expiresAt.getTime())) {
+if (expiresAt && !Number.isFinite(expiresAt.getTime())) {
   throw new Error("public/apk.json contains an invalid expiresAt date.");
 }
 
-if (expiresAt <= new Date()) {
+if (expiresAt && expiresAt <= new Date()) {
   throw new Error(
     `The hosted APK expired on ${expiresAt.toISOString()}. Publish a fresh build and update public/apk.json.`
   );
+}
+
+if (metadata.sha256 && !/^[a-f0-9]{64}$/i.test(metadata.sha256)) {
+  throw new Error("public/apk.json contains an invalid sha256 checksum.");
 }
 
 const response = await fetch(metadata.apkUrl, {
@@ -43,5 +47,7 @@ if (!Number.isFinite(reportedSize) || reportedSize <= 1) {
 }
 
 console.log(
-  `APK is available (${metadata.sizeBytes} bytes) and listed until ${expiresAt.toISOString()}.`
+  expiresAt
+    ? `APK is available (${metadata.sizeBytes} bytes) and listed until ${expiresAt.toISOString()}.`
+    : `APK is available (${metadata.sizeBytes} bytes) from ${metadata.hosting || "its configured host"}; no expiry is listed.`
 );

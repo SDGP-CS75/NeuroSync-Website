@@ -86,17 +86,20 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for the full deployment and release procedure
 ## Beta download
 
 `public/apk.json` is the source of truth for the download URL, byte size,
-publication dates, and feedback link. The page fetches it at runtime and keeps
-its static download links synchronized through the automated checks.
+publication dates, hosting label, optional checksum, and feedback link. The
+page fetches it at runtime and keeps its static download links synchronized
+through the automated checks.
 
 The current APK is an Expo EAS temporary artifact. It must be replaced before
-`expiresAt` or the monitor will fail. For a durable public beta:
+`expiresAt` or the monitor will fail. `expiresAt` is optional for durable
+hosting; omit it when the host does not expire the artifact. For a durable
+public beta:
 
 1. Publish the signed APK as a GitHub Release asset or another stable,
    organization-controlled HTTPS host.
-2. Update `apkUrl`, `sizeBytes`, `listedAt`, and `expiresAt` in
-   `public/apk.json`. Use a conservative `expiresAt` only when the host truly
-   expires; do not invent a short expiry for durable hosting.
+2. Update `apkUrl`, `hosting`, `sizeBytes`, and `listedAt` in
+   `public/apk.json`. Add `sha256` after computing a checksum, and add
+   `expiresAt` only when the host truly expires.
 3. Update the release details in `support.html` and the static fallback values
    in `index.html`.
 4. Run `npm run check:download` and `npm test`.
@@ -104,6 +107,32 @@ The current APK is an Expo EAS temporary artifact. It must be replaced before
 
 Never distribute an APK from an untrusted mirror. Android users should install
 only the build linked by the official site.
+
+The current verified checksum is stored in `public/apk.json` and shown in the
+download section. Recompute it after publishing any replacement APK:
+
+```bash
+shasum -a 256 path/to/neurosync.apk
+```
+
+### Durable APK hosting options
+
+- **GitHub Releases (recommended):** upload the signed APK as a release asset,
+  not into Git history. Use a stable asset name and link to
+  `/releases/latest/download/neurosync-android-beta.apk`. There is no
+  time-based artifact expiry, and the APK remains available with the release.
+- **Cloudflare R2:** suitable when the project needs a custom download domain
+  and predictable bandwidth. Configure public access deliberately and add a
+  checksum to `public/apk.json`.
+- **Supabase Storage or Firebase Storage:** reasonable if the app already uses
+  that platform and its access and billing rules are understood.
+- **Vercel static hosting:** possible, but an approximately 89 MB binary makes
+  every deployment larger and is not the best long-term artifact host.
+- **Rebuilding through Expo:** useful for producing a new APK, but new EAS
+  artifacts are also temporary unless downloaded to a durable host.
+
+Avoid public Google Drive, Dropbox, and OneDrive links for APK delivery because
+their browser interstitials and link behavior make installation unreliable.
 
 ## Project structure
 
