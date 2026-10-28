@@ -235,6 +235,9 @@ async function runViewportChecks(client, origin, { width, height, mobile }) {
       toggle.click();
       const opened = toggle.getAttribute("aria-expanded") === "true" && nav.classList.contains("active");
       const lastLink = nav.querySelector("a:last-child");
+      document.querySelector("main").focus();
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+      const trappedFromOutside = document.activeElement === toggle;
       lastLink.focus();
       document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
       const tabWraps = document.activeElement === toggle;
@@ -248,6 +251,7 @@ async function runViewportChecks(client, origin, { width, height, mobile }) {
       document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
       return {
         opened,
+        trappedFromOutside,
         tabWraps,
         shiftTabWraps,
         closed: toggle.getAttribute("aria-expanded") === "false" && !nav.classList.contains("active"),
@@ -255,6 +259,7 @@ async function runViewportChecks(client, origin, { width, height, mobile }) {
       };
     })()`);
     assert(menuResult.opened, `${width}px: mobile menu did not open.`);
+    assert(menuResult.trappedFromOutside, `${width}px: focus escaped the open mobile menu.`);
     assert(menuResult.tabWraps, `${width}px: Tab did not wrap inside the mobile menu.`);
     assert(menuResult.shiftTabWraps, `${width}px: Shift+Tab did not wrap inside the mobile menu.`);
     assert(menuResult.closed, `${width}px: Escape did not close the mobile menu.`);

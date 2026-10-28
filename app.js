@@ -183,6 +183,12 @@ function setupMobileMenu() {
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
 
+    if (!focusable.includes(document.activeElement)) {
+      event.preventDefault();
+      first.focus();
+      return;
+    }
+
     if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
       last.focus();
@@ -238,7 +244,9 @@ function setupDownloadMetadata() {
     downloadHost,
     downloadListed,
     downloadExpiry,
+    downloadExpiryRow,
     downloadChecksum,
+    downloadChecksumRow,
     downloadAvailability,
   ].filter(Boolean);
 
