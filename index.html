@@ -4,494 +4,560 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NeuroSync | Focus Without Pressure</title>
+  <title>NeuroSync | Focus without pressure</title>
   <meta name="description"
-    content="NeuroSync is a calm productivity companion for ADHD minds, designed to reduce overwhelm with gentle routines, task support, and emotion-aware focus." />
+    content="NeuroSync is a calm Android companion for ADHD minds, turning overwhelming tasks into one clear next step with flexible routines and judgment-free mood check-ins." />
+  <meta name="theme-color" content="#f7f6fb" />
   <link rel="icon" type="image/jpeg" href="./logo.jpeg" />
   <link rel="preload" href="./assets/fonts/lexend-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="./styles.css" />
+  <script src="./app.js" defer></script>
 </head>
 
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
 
-  <!-- App Intro Section: Nymo Landing -->
-  <!-- Note: Server-side includes are not supported on Vercel. If you need app-intro.html content, include it directly here. -->
-  <div class="page-background" aria-hidden="true">
-    <div class="glow glow-lilac"></div>
-    <div class="glow glow-blue"></div>
-    <div class="glow glow-mint"></div>
-    <div class="grain"></div>
-  </div>
-
   <header class="site-header">
-    <a class="brand" href="#hero" aria-label="NeuroSync home">
-      <span class="brand-mark">
-        <picture class="brand-picture">
+    <div class="header-inner">
+      <a class="brand" href="#top" aria-label="NeuroSync home">
+        <picture>
           <source type="image/avif"
-            srcset="./assets/images/logo-96.avif 96w, ./assets/images/logo-192.avif 192w" sizes="46px" />
+            srcset="./assets/images/logo-96.avif 96w, ./assets/images/logo-192.avif 192w" sizes="40px" />
           <source type="image/webp"
-            srcset="./assets/images/logo-96.webp 96w, ./assets/images/logo-192.webp 192w" sizes="46px" />
-          <img src="./logo.png" alt="" width="192" height="192" />
+            srcset="./assets/images/logo-96.webp 96w, ./assets/images/logo-192.webp 192w" sizes="40px" />
+          <img src="./logo.png" alt="" width="40" height="40" />
         </picture>
-      </span>
-      <span class="brand-copy">
-        <strong>NeuroSync</strong>
-        <small>ADHD-friendly focus companion</small>
-      </span>
-    </a>
+        <span>NeuroSync</span>
+      </a>
 
-    <nav class="site-nav" aria-label="Primary">
-      <a href="#problem">Why it helps</a>
-      <a href="#story">Experience</a>
-      <a href="#difference">Difference</a>
-      <a href="#download">Android beta</a>
-    </nav>
+      <nav class="desktop-nav" aria-label="Primary">
+        <a href="#why">Why it helps</a>
+        <a href="#features">How it works</a>
+        <a href="#experience">Experience</a>
+        <a href="#faq">FAQ</a>
+      </nav>
 
-    <a class="nav-cta" id="download-nav-link" data-download-link
-      href="https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"
-      target="_blank" rel="noopener noreferrer">Download</a>
-
-    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open menu" aria-expanded="false"
-      aria-controls="mobileNav">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </button>
-
-    <nav class="mobile-nav" id="mobileNav" aria-label="Mobile">
-      <a href="#problem">Why it helps</a>
-      <a href="#story">Experience</a>
-      <a href="#difference">Difference</a>
-      <a href="#download">Android beta</a>
-      <a class="mobile-nav-cta" id="download-mobile-link" data-download-link
+      <a class="header-cta" data-download-link
         href="https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"
-        target="_blank" rel="noopener noreferrer">Download</a>
+        target="_blank" rel="noopener noreferrer">Android beta</a>
+
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Open menu"
+        aria-expanded="false" aria-controls="mobileNav">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <nav class="mobile-nav" id="mobileNav" aria-label="Mobile" aria-hidden="true">
+      <a href="#why">Why it helps</a>
+      <a href="#features">How it works</a>
+      <a href="#experience">Experience</a>
+      <a href="#faq">FAQ</a>
+      <a href="#team">Team</a>
+      <a data-download-link
+        href="https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"
+        target="_blank" rel="noopener noreferrer">Download Android beta</a>
     </nav>
   </header>
 
   <main id="main-content" tabindex="-1">
-    <section class="hero section-shell" id="hero">
-      <div class="hero-copy reveal">
-        <p class="eyebrow">Calm productivity for ADHD minds</p>
-        <h1 class="headline">Focus Without Pressure</h1>
-        <p class="lead">
-          A calm productivity system designed for ADHD minds. Gentle structure,
-          emotion-aware guidance, and one clear next step at a time.
-        </p>
-        <div class="hero-actions">
-          <a class="button button-primary" data-download-link
-            href="https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"
-            target="_blank" rel="noopener noreferrer">Download for Android</a>
-          <a class="button button-secondary" href="#story">See how it works</a>
+    <section class="hero" id="top">
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <h1><span>Focus</span><span>without pressure.</span></h1>
+          <p class="hero-lead">
+            NeuroSync turns an overwhelming task into one small next step, with
+            flexible routines, mood check-ins, and no streak guilt.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" data-download-link
+              href="https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"
+              target="_blank" rel="noopener noreferrer">Download Android beta</a>
+            <a class="text-link" href="#experience">See the experience</a>
+          </div>
+          <p class="hero-meta">
+            Direct APK <span aria-hidden="true">&middot;</span>
+            <span data-download-size>88.8 MB</span>
+            <span aria-hidden="true">&middot;</span> Android
+          </p>
         </div>
-      </div>
 
-      <div class="hero-phone-wrap">
-        <div class="hero-orbit orbit-one"></div>
-        <div class="hero-orbit orbit-two"></div>
-        <div class="phone-scene hero-scene" data-phone-scene>
-          <div class="phone-device hero-phone" data-phone>
-            <div class="phone-side side-left"></div>
-            <div class="phone-side side-left lower"></div>
-            <div class="phone-side side-right"></div>
-            <div class="phone-glare"></div>
-            <div class="phone-edge"></div>
-            <div class="phone-screen hero-splash-screen">
-              <div class="dynamic-island"></div>
-              <div class="screen-gradient"></div>
-              <div class="screen-noise"></div>
-              <div class="app-ui hero-ui splash-ui">
-                <div class="status-row splash-status">
-                  <span>NeuroSync</span>
-                  <span id="device-clock">09:41</span>
-                </div>
-
-                <div class="splash-logo-wrap">
-                  <picture>
-                    <source type="image/avif"
-                      srcset="./assets/images/splash-logo-320.avif 320w, ./assets/images/splash-logo-520.avif 520w"
-                      sizes="260px" />
-                    <source type="image/webp"
-                      srcset="./assets/images/splash-logo-320.webp 320w, ./assets/images/splash-logo-520.webp 520w"
-                      sizes="260px" />
-                    <img src="./splash-logo.png" alt="NeuroSync lotus logo" class="splash-logo" width="520"
-                      height="520" fetchpriority="high" />
-                  </picture>
-                </div>
+        <div class="hero-stage reveal">
+          <div class="next-step-ui" data-ui data-live-step>
+            <div class="ui-topline">
+              <div>
+                <strong>Today</strong>
+                <span>One clear next step</span>
               </div>
+              <time id="device-clock" datetime="09:41">09:41</time>
+            </div>
+
+            <div class="ui-focus-card">
+              <p class="ui-label">Project proposal</p>
+              <h2>Open the project brief.</h2>
+              <p>8 minutes <span aria-hidden="true">&middot;</span> low effort</p>
+            </div>
+
+            <div class="ui-progress" role="progressbar" aria-label="Task breakdown progress" aria-valuemin="0"
+              aria-valuemax="3" aria-valuenow="0" data-progress-root>
+              <span data-progress-bar></span>
+            </div>
+
+            <div class="ui-step-list" aria-label="Small steps">
+              <button class="ui-step" type="button" data-step-button aria-pressed="false">
+                <span class="ui-check" aria-hidden="true"></span>
+                <span class="ui-step-copy">Open the brief<small>2 min</small></span>
+              </button>
+              <button class="ui-step" type="button" data-step-button aria-pressed="false">
+                <span class="ui-check" aria-hidden="true"></span>
+                <span class="ui-step-copy">Write one sentence<small>4 min</small></span>
+              </button>
+              <button class="ui-step" type="button" data-step-button aria-pressed="false">
+                <span class="ui-check" aria-hidden="true"></span>
+                <span class="ui-step-copy">Add three headings<small>2 min</small></span>
+              </button>
+            </div>
+
+            <div class="ui-footer">
+              <p data-next-copy>Next: open the brief.</p>
+              <button class="ui-reset" type="button" data-reset-step hidden>Reset</button>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="problem section-shell" id="problem">
-      <div class="section-copy reveal">
-        <p class="eyebrow">When productivity feels heavy</p>
-        <h2 class="section-title">Some days, the hardest part is beginning.</h2>
-        <p class="section-lead">
-          NeuroSync was designed for moments that feel noisy, stuck, or emotionally
-          loaded, not just the days when everything is already going well.
-        </p>
-      </div>
-
-      <div class="problem-grid">
-        <article class="problem-card reveal">
-          <span class="problem-index">01</span>
-          <h3>Task paralysis</h3>
-          <p>When the task is too big, even opening it can feel overwhelming.</p>
-        </article>
-        <article class="problem-card reveal">
-          <span class="problem-index">02</span>
-          <h3>Overloaded to-do lists</h3>
-          <p>Too many priorities at once turns planning into pressure.</p>
-        </article>
-        <article class="problem-card reveal">
-          <span class="problem-index">03</span>
-          <h3>Inconsistent routines</h3>
-          <p>Rigid systems break easily when real life changes shape.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="story" id="story">
-      <div class="story-inner">
-        <div class="story-copy">
-          <article class="story-step active" data-step="focus">
-            <p class="eyebrow">Focus Mode</p>
-            <h2 class="section-title">A softer way into attention.</h2>
-            <p>
-              Calming soundscapes, a distraction-light interface, and one timer that
-              helps you settle in without feeling watched.
-            </p>
-          </article>
-
-          <article class="story-step" data-step="breakdown" aria-hidden="true">
-            <p class="eyebrow">AI Task Breakdown</p>
-            <h2 class="section-title">When a task feels too big, we make it smaller.</h2>
-            <p>
-              NeuroSync gently breaks overwhelming work into clear, doable steps so
-              getting started feels safer.
-            </p>
-          </article>
-
-          <article class="story-step" data-step="routine" aria-hidden="true">
-            <p class="eyebrow">Adaptive Routine Builder</p>
-            <h2 class="section-title">Structure that bends with real life.</h2>
-            <p>
-              Flexible scheduling, smart reminders, and routines that support
-              consistency without becoming rigid.
-            </p>
-          </article>
-
-          <article class="story-step" data-step="mood" aria-hidden="true">
-            <p class="eyebrow">Mood Tracking</p>
-            <h2 class="section-title">Your emotions belong in the system too.</h2>
-            <p>
-              Track how you feel, notice patterns, and build self-awareness without
-              judgment or performance pressure.
-            </p>
-          </article>
-
-          <article class="story-step" data-step="dashboard" aria-hidden="true">
-            <p class="eyebrow">Minimal Dashboard</p>
-            <h2 class="section-title">Everything important. Nothing noisy.</h2>
-            <p>
-              A clean home base for tasks, mood, routines, and recovery, designed to
-              reduce cognitive load from the first glance.
-            </p>
-          </article>
+    <section class="section problem" id="why">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2>When everything feels loud.</h2>
+          <p>
+            NeuroSync is designed for the days when starting feels heavy, not only
+            for the days when productivity already comes easily.
+          </p>
         </div>
 
-        <div class="story-phone">
-          <div class="phone-scene sticky-scene" data-phone-scene>
-            <div class="phone-device story-device" data-phone>
-              <div class="phone-side side-left"></div>
-              <div class="phone-side side-left lower"></div>
-              <div class="phone-side side-right"></div>
-              <div class="phone-glare"></div>
-              <div class="phone-edge"></div>
-              <div class="phone-screen">
-                <div class="dynamic-island"></div>
-                <div class="screen-gradient"></div>
-                <div class="screen-noise"></div>
+        <div class="problem-layout">
+          <div class="problem-list reveal">
+            <article>
+              <h3>Too many priorities.</h3>
+              <p>A full list turns planning into another source of pressure.</p>
+            </article>
+            <article>
+              <h3>A task that feels enormous.</h3>
+              <p>When the first step is unclear, opening the task can feel impossible.</p>
+            </article>
+            <article>
+              <h3>A routine that breaks.</h3>
+              <p>Rigid systems punish real life instead of adapting to it.</p>
+            </article>
+          </div>
 
-                <div class="screen-state is-visible" data-screen="focus" style="padding:0; overflow:hidden;">
-                  <picture>
-                    <source type="image/avif" srcset="./assets/images/story-screen-440.avif" />
-                    <source type="image/webp" srcset="./assets/images/story-screen-440.webp" />
-                    <img src="./story-screen.png" alt="Focus mode with a calm timer and soundscape"
-                      class="story-screen-img" width="440" height="956" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-
-                <div class="screen-state" data-screen="breakdown" aria-hidden="true"
-                  style="padding:0; overflow:hidden;">
-                  <picture>
-                    <source type="image/avif" srcset="./assets/images/story-screen-2-440.avif" />
-                    <source type="image/webp" srcset="./assets/images/story-screen-2-440.webp" />
-                    <img src="./story-screen-2.png" alt="AI task breakdown with suggested subtasks"
-                      class="story-screen-img" width="440" height="956" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-
-                <div class="screen-state" data-screen="routine" aria-hidden="true"
-                  style="padding:0; overflow:hidden;">
-                  <picture>
-                    <source type="image/avif" srcset="./assets/images/story-screen-3-440.avif" />
-                    <source type="image/webp" srcset="./assets/images/story-screen-3-440.webp" />
-                    <img src="./story-screen-3.png" alt="Adaptive routine guidance"
-                      class="story-screen-img" width="440" height="956" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-
-                <div class="screen-state" data-screen="mood" aria-hidden="true"
-                  style="padding:0; overflow:hidden;">
-                  <picture>
-                    <source type="image/avif" srcset="./assets/images/story-screen-4-440.avif" />
-                    <source type="image/webp" srcset="./assets/images/story-screen-4-440.webp" />
-                    <img src="./story-screen-4.png" alt="Mood journal check-in"
-                      class="story-screen-img" width="440" height="956" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-
-                <div class="screen-state" data-screen="dashboard" aria-hidden="true"
-                  style="padding:0; overflow:hidden;">
-                  <picture>
-                    <source type="image/avif" srcset="./assets/images/story-screen-5-440.avif" />
-                    <source type="image/webp" srcset="./assets/images/story-screen-5-440.webp" />
-                    <img src="./story-screen-5.png" alt="NeuroSync dashboard with tasks and routines"
-                      class="story-screen-img" width="440" height="956" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
+          <div class="tone-stage problem-stage reveal">
+            <div class="mood-ui" data-ui>
+              <p class="ui-label">Mood check-in</p>
+              <h3>I feel overwhelmed.</h3>
+              <div class="mood-options" aria-label="Selected mood: overwhelmed">
+                <span>Low</span>
+                <span>Foggy</span>
+                <span class="selected">Overwhelmed</span>
+                <span>Okay</span>
               </div>
+              <div class="mood-response">
+                <strong>That is information, not failure.</strong>
+                <p>Start with a two-minute reset, then return to one task.</p>
+              </div>
+              <p class="ui-quiet-note">No score. No streak. No judgment.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="emotion section-shell" id="emotion">
-      <div class="emotion-card reveal">
-        <p class="eyebrow">Guilt-free recovery</p>
-        <h2 class="section-title">No guilt. No pressure. Just progress.</h2>
-        <p>
-          Missed a routine? Lost momentum? NeuroSync helps you restart kindly,
-          without streak anxiety, punishment, or shame.
-        </p>
+    <section class="section features" id="features">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2>Three tools. One calm place.</h2>
+          <p>
+            Each part of NeuroSync reduces a different kind of friction while
+            keeping the next action visible.
+          </p>
+        </div>
+
+        <div class="feature-rows">
+          <article class="feature-row reveal">
+            <div class="feature-copy">
+              <h3>Break big tasks down.</h3>
+              <p>
+                Turn one large task into small, concrete steps. Each step has a
+                realistic time estimate and a clear finish line.
+              </p>
+            </div>
+            <div class="tone-stage task-stage">
+              <div class="task-ui" data-ui>
+                <div class="ui-topline">
+                  <div>
+                    <strong>Draft project proposal</strong>
+                    <span>3 small steps</span>
+                  </div>
+                  <span class="ui-status">In progress</span>
+                </div>
+                <ul class="task-list">
+                  <li class="done">
+                    <span class="ui-check" aria-hidden="true"></span>
+                    <span>Open the brief</span>
+                    <small>Done</small>
+                  </li>
+                  <li class="current">
+                    <span class="ui-check" aria-hidden="true"></span>
+                    <span>Write one sentence</span>
+                    <small>4 min</small>
+                  </li>
+                  <li>
+                    <span class="ui-check" aria-hidden="true"></span>
+                    <span>Add three headings</span>
+                    <small>2 min</small>
+                  </li>
+                </ul>
+                <p class="ui-next-line">Next: write one sentence. That is enough for now.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="feature-row reveal">
+            <div class="feature-copy">
+              <h3>Build routines that bend.</h3>
+              <p>
+                Plan a rhythm for the day, then switch to a lower-energy version
+                when the day changes shape. Consistency without punishment.
+              </p>
+            </div>
+            <div class="tone-stage routine-stage">
+              <div class="routine-ui" data-ui>
+                <div class="ui-topline">
+                  <div>
+                    <strong>Wednesday</strong>
+                    <span>Low-energy version</span>
+                  </div>
+                  <span class="ui-status">Flexible</span>
+                </div>
+                <div class="routine-list">
+                  <div>
+                    <time>09:30</time>
+                    <span>Morning reset</span>
+                    <small>Done</small>
+                  </div>
+                  <div class="current">
+                    <time>11:00</time>
+                    <span>One priority task</span>
+                    <small>25 min</small>
+                  </div>
+                  <div>
+                    <time>14:30</time>
+                    <span>Walk and water</span>
+                    <small>10 min</small>
+                  </div>
+                </div>
+                <div class="routine-note">
+                  <strong>Today's adjustment</strong>
+                  <p>We shortened the reset from 20 minutes to 5.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="feature-row reveal">
+            <div class="feature-copy">
+              <h3>Notice patterns gently.</h3>
+              <p>
+                Quick check-ins reveal what affects your focus. The goal is
+                self-awareness, not a perfect line on a chart.
+              </p>
+            </div>
+            <div class="tone-stage mood-stage">
+              <div class="insight-ui" data-ui>
+                <div class="ui-topline">
+                  <div>
+                    <strong>This week</strong>
+                    <span>Mood and focus</span>
+                  </div>
+                  <span class="ui-status">6 check-ins</span>
+                </div>
+                <h3>Focused, then tired.</h3>
+                <div class="week-chart" role="img"
+                  aria-label="Focus was highest on Monday and Thursday and lower on Wednesday">
+                  <div><span style="--height: 58%"></span><small>M</small></div>
+                  <div><span style="--height: 72%"></span><small>T</small></div>
+                  <div><span style="--height: 38%"></span><small>W</small></div>
+                  <div><span style="--height: 84%"></span><small>T</small></div>
+                  <div><span style="--height: 64%"></span><small>F</small></div>
+                  <div><span style="--height: 50%"></span><small>S</small></div>
+                </div>
+                <p class="ui-next-line">Pattern: focus tends to dip after a shorter night.</p>
+              </div>
+            </div>
+          </article>
+        </div>
       </div>
     </section>
 
-    <section class="difference section-shell" id="difference">
-      <div class="section-copy reveal">
-        <p class="eyebrow">How it’s different</p>
-        <h2 class="section-title">Built for support, not pressure.</h2>
-      </div>
+    <section class="experience" id="experience" aria-labelledby="experience-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2 id="experience-title">From stuck to started.</h2>
+          <p>
+            A short walk through the product: choose one task, let the plan adapt,
+            then check in without judgment.
+          </p>
+        </div>
 
-      <div class="difference-grid">
-        <article class="compare-card reveal">
-          <span class="compare-label muted">Traditional apps</span>
-          <ul class="compare-list">
-            <li>Rigid routines</li>
-            <li>Punishing streak logic</li>
-            <li>Too many tools to manage</li>
-            <li>Focus without emotional support</li>
-          </ul>
-        </article>
+        <div class="story-inner">
+          <div class="story-copy">
+            <article class="story-step active">
+              <h3>Choose one task.</h3>
+              <p>
+                Focus mode removes the noise around the rest of the list and gives
+                one task a calm, visible place to begin.
+              </p>
+            </article>
+            <article class="story-step">
+              <h3>Let the plan bend.</h3>
+              <p>
+                Adaptive routines keep the shape of the day without turning a
+                missed minute into a failed streak.
+              </p>
+            </article>
+            <article class="story-step">
+              <h3>Check in gently.</h3>
+              <p>
+                Mood tracking turns a difficult day into useful context, not a
+                verdict on how productive you were.
+              </p>
+            </article>
+          </div>
 
-        <article class="compare-card featured reveal">
-          <span class="compare-label">NeuroSync</span>
-          <ul class="compare-list">
-            <li>Flexible, adaptive structure</li>
-            <li>Reward-based progress</li>
-            <li>Unified system for focus, mood, and routines</li>
-            <li>Emotion-aware, non-judgmental guidance</li>
-          </ul>
-        </article>
+          <div class="story-stage-wrap">
+            <div class="story-stage">
+              <figure class="screen-state is-visible" data-screen="focus">
+                <picture>
+                  <source type="image/avif" srcset="./assets/images/story-screen-440.avif" />
+                  <source type="image/webp" srcset="./assets/images/story-screen-440.webp" />
+                  <img src="./story-screen.png" alt="Focus mode with a calm timer and soundscape" width="440"
+                    height="956" loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+              <figure class="screen-state" data-screen="routine">
+                <picture>
+                  <source type="image/avif" srcset="./assets/images/story-screen-3-440.avif" />
+                  <source type="image/webp" srcset="./assets/images/story-screen-3-440.webp" />
+                  <img src="./story-screen-3.png" alt="Adaptive routine guidance" width="440" height="956"
+                    loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+              <figure class="screen-state" data-screen="mood">
+                <picture>
+                  <source type="image/avif" srcset="./assets/images/story-screen-4-440.avif" />
+                  <source type="image/webp" srcset="./assets/images/story-screen-4-440.webp" />
+                  <img src="./story-screen-4.png" alt="Mood journal check-in" width="440" height="956"
+                    loading="lazy" decoding="async" />
+                </picture>
+              </figure>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
+    <section class="section difference" id="difference">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2>Support, not pressure.</h2>
+          <p>
+            NeuroSync keeps the structure of a productivity tool while removing
+            the punishment that makes rigid systems hard to return to.
+          </p>
+        </div>
 
-    <section class="team section-shell" id="team">
-      <div class="section-copy reveal">
-        <p class="eyebrow">The people behind NeuroSync</p>
-        <h2 class="section-title">Meet the team.</h2>
-        <p class="section-lead">A passionate group of designers and developers building calm, caring technology for ADHD
-          minds.</p>
+        <div class="comparison-grid reveal">
+          <div class="comparison-field comparison-traditional">
+            <h3>Traditional productivity</h3>
+            <ul>
+              <li>Rigid routines that break when life changes.</li>
+              <li>Streak penalties and all-or-nothing scoring.</li>
+              <li>Focus tools separated from mood and recovery.</li>
+              <li>More settings, more lists, more decisions.</li>
+            </ul>
+          </div>
+          <div class="comparison-field comparison-neurosync">
+            <h3>NeuroSync</h3>
+            <ul>
+              <li>Flexible routines with a lower-energy version.</li>
+              <li>A gentle restart without lost progress.</li>
+              <li>Tasks, mood, and recovery in one calm home.</li>
+              <li>One clear next step at a time.</li>
+            </ul>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="team-grid">
-        <article class="team-card reveal">
-          <div class="team-avatar team-avatar-photo">
+    <section class="section team" id="team">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2>Meet the team.</h2>
+          <p>
+            Six designers and developers building calm, caring technology for ADHD
+            minds.
+          </p>
+        </div>
+
+        <div class="team-grid">
+          <article class="team-member reveal">
             <picture>
               <source type="image/avif"
                 srcset="./assets/images/sujaya-160.avif 160w, ./assets/images/sujaya-320.avif 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <source type="image/webp"
                 srcset="./assets/images/sujaya-160.webp 160w, ./assets/images/sujaya-320.webp 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <img src="./sujaya.png" alt="Sujaya De Silva" width="320" height="320" loading="lazy"
                 decoding="async" />
             </picture>
-          </div>
-          <div class="team-info">
-            <strong>Sujaya De Silva</strong>
-            <span>Project Lead</span>
-          </div>
-        </article>
+            <h3>Sujaya De Silva</h3>
+            <p>Project Lead</p>
+          </article>
 
-        <article class="team-card reveal">
-          <div class="team-avatar team-avatar-photo">
+          <article class="team-member reveal">
             <picture>
               <source type="image/avif"
                 srcset="./assets/images/team-sf-160.avif 160w, ./assets/images/team-sf-320.avif 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <source type="image/webp"
                 srcset="./assets/images/team-sf-160.webp 160w, ./assets/images/team-sf-320.webp 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <img src="./team-sf.jpg" alt="Chamath Silva" width="320" height="320" loading="lazy"
                 decoding="async" />
             </picture>
-          </div>
-          <div class="team-info">
-            <strong>Chamath Silva</strong>
-            <span>UI/UX Lead</span>
-          </div>
-        </article>
+            <h3>Chamath Silva</h3>
+            <p>UI/UX Lead</p>
+          </article>
 
-        <article class="team-card reveal">
-          <div class="team-avatar team-avatar-photo">
+          <article class="team-member reveal">
             <picture>
               <source type="image/avif"
                 srcset="./assets/images/jinalle-160.avif 160w, ./assets/images/jinalle-320.avif 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <source type="image/webp"
                 srcset="./assets/images/jinalle-160.webp 160w, ./assets/images/jinalle-320.webp 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <img src="./jinalle.png" alt="Jinalee Subasinghe" width="320" height="320" loading="lazy"
                 decoding="async" />
             </picture>
-          </div>
-          <div class="team-info">
-            <strong>Jinalee Subasinghe</strong>
-            <span>Full Stack Developer & Marketing Lead</span>
-          </div>
-        </article>
+            <h3>Jinalee Subasinghe</h3>
+            <p>Full Stack and Marketing</p>
+          </article>
 
-        <article class="team-card reveal">
-          <div class="team-avatar team-avatar-photo">
+          <article class="team-member reveal">
             <picture>
               <source type="image/avif"
                 srcset="./assets/images/nadil-160.avif 160w, ./assets/images/nadil-320.avif 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <source type="image/webp"
                 srcset="./assets/images/nadil-160.webp 160w, ./assets/images/nadil-320.webp 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <img src="./nadil.png" alt="Nadil Karunarathna" width="320" height="320" loading="lazy"
                 decoding="async" />
             </picture>
-          </div>
-          <div class="team-info">
-            <strong>Nadil Karunarathna</strong>
-            <span>Full-Stack Developer</span>
-          </div>
-        </article>
+            <h3>Nadil Karunarathna</h3>
+            <p>Full-Stack Developer</p>
+          </article>
 
-        <article class="team-card reveal">
-          <div class="team-avatar team-avatar-photo">
+          <article class="team-member reveal">
             <picture>
               <source type="image/avif"
                 srcset="./assets/images/ravindu-160.avif 160w, ./assets/images/ravindu-320.avif 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <source type="image/webp"
                 srcset="./assets/images/ravindu-160.webp 160w, ./assets/images/ravindu-320.webp 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <img src="./ravindu.jpeg" alt="Ravindu Withana" width="320" height="320" loading="lazy"
                 decoding="async" />
             </picture>
-          </div>
-          <div class="team-info">
-            <strong>Ravindu Withana</strong>
-            <span>Backend Developer</span>
-          </div>
-        </article>
+            <h3>Ravindu Withana</h3>
+            <p>Backend Developer</p>
+          </article>
 
-        <article class="team-card reveal">
-          <div class="team-avatar team-avatar-photo">
+          <article class="team-member reveal">
             <picture>
               <source type="image/avif"
                 srcset="./assets/images/sandun-160.avif 160w, ./assets/images/sandun-320.avif 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <source type="image/webp"
                 srcset="./assets/images/sandun-160.webp 160w, ./assets/images/sandun-320.webp 320w"
-                sizes="145px" />
+                sizes="(max-width: 640px) 45vw, 190px" />
               <img src="./sandun.jpeg" alt="Sandun Gunawardana" width="320" height="320" loading="lazy"
                 decoding="async" />
             </picture>
-          </div>
-          <div class="team-info">
-            <strong>Sandun Gunawardana</strong>
-            <span>Full-Stack Developer</span>
-          </div>
-        </article>
+            <h3>Sandun Gunawardana</h3>
+            <p>Full-Stack Developer</p>
+          </article>
+        </div>
       </div>
     </section>
 
-    <section class="faq section-shell" id="faq">
-      <div class="section-copy reveal">
-        <h2 class="section-title">Questions, answered.</h2>
-        <p class="section-lead">
-          What to expect from the Android beta and where to get help.
-        </p>
-      </div>
+    <section class="section faq" id="faq">
+      <div class="container faq-layout">
+        <div class="section-heading reveal">
+          <h2>Questions, answered.</h2>
+          <p>What to expect from the Android beta and where to get help.</p>
+        </div>
 
-      <div class="faq-list reveal">
-        <details>
-          <summary>Which devices can use the beta?</summary>
-          <p>
-            The current beta is an Android APK for Android phones and tablets.
-            There is no iOS build yet.
-          </p>
-        </details>
-        <details>
-          <summary>Why does Android warn about the download?</summary>
-          <p>
-            The beta is installed directly from this page rather than through
-            Google Play. Android may ask you to allow installs from your browser.
-            Only install an APK you downloaded from this page.
-          </p>
-        </details>
-        <details>
-          <summary>Is NeuroSync medical care?</summary>
-          <p>
-            No. NeuroSync is a productivity and self-management tool, not a
-            medical device, diagnosis, therapy, or emergency service.
-          </p>
-        </details>
-        <details>
-          <summary>What should I do if the download expires?</summary>
-          <p>
-            The current Expo-hosted build is time-limited. Open the beta
-            feedback link in the download section and request a fresh build.
-          </p>
-        </details>
-        <details>
-          <summary>Where can I report a bug or ask a privacy question?</summary>
-          <p>
-            Use the <a href="support.html">support page</a> or the issue tracker
-            linked from the download section. Do not post sensitive health
-            information in a public issue.
-          </p>
-        </details>
+        <div class="faq-list reveal">
+          <details>
+            <summary>Which devices can use the beta?</summary>
+            <p>
+              The current beta is an Android APK for Android phones and tablets.
+              There is no iOS build yet.
+            </p>
+          </details>
+          <details>
+            <summary>Why does Android warn about the download?</summary>
+            <p>
+              The beta is installed directly from this page rather than through
+              Google Play. Android may ask you to allow installs from your browser.
+              Only install an APK you downloaded from this page.
+            </p>
+          </details>
+          <details>
+            <summary>Is NeuroSync medical care?</summary>
+            <p>
+              No. NeuroSync is a productivity and self-management tool, not a
+              medical device, diagnosis, therapy, or emergency service.
+            </p>
+          </details>
+          <details>
+            <summary>What should I do if the download expires?</summary>
+            <p>
+              The current Expo-hosted build is time-limited. Open the beta
+              feedback link in the download section and request a fresh build.
+            </p>
+          </details>
+          <details>
+            <summary>Where can I report a bug or ask a privacy question?</summary>
+            <p>
+              Use the <a href="./support.html">support page</a> or the issue tracker
+              linked from the download section. Do not post sensitive health
+              information in a public issue.
+            </p>
+          </details>
+        </div>
       </div>
     </section>
 
-    <section class="cta section-shell" id="download">
-      <div class="cta-card download-panel reveal">
-        <div class="download-copy">
-          <p class="eyebrow">Android beta</p>
-          <h2 class="section-title">Take NeuroSync with you.</h2>
+    <section class="download" id="download">
+      <div class="container download-grid">
+        <div class="download-copy reveal">
+          <h2>Take the beta with you.</h2>
           <p>
             Download the current Android beta directly. Because this is an APK,
             Android will ask you to allow installs from your browser before the
@@ -504,7 +570,7 @@
           </ol>
         </div>
 
-        <div class="download-meta">
+        <div class="download-meta reveal">
           <dl>
             <div>
               <dt>Channel</dt>
@@ -519,13 +585,13 @@
               <dd data-download-listed>28 Oct 2026</dd>
             </div>
           </dl>
-          <a class="button button-primary download-button" data-download-link
+          <a class="button button-light" data-download-link
             href="https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"
             target="_blank" rel="noopener noreferrer">Download APK</a>
-          <a class="text-link"
+          <a class="download-link"
             href="https://github.com/SDGP-CS75/NeuroSync-Website/issues/new?title=NeuroSync%20beta%20feedback"
             target="_blank" rel="noopener noreferrer">Report a beta issue</a>
-          <a class="text-link" href="support.html#release">Release notes and support</a>
+          <a class="download-link" href="./support.html#release">Release notes and support</a>
           <p class="download-availability" data-download-availability>
             This beta build is hosted by Expo and is available for a limited time.
             If the link has expired, request a fresh build in the issue tracker.
@@ -536,20 +602,21 @@
   </main>
 
   <footer class="site-footer">
-    <div class="footer-inner">
-      <p><strong>NeuroSync</strong> is a student-built focus companion for ADHD minds.</p>
-      <nav aria-label="Footer">
-        <a href="support.html">Support</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-        <a href="https://github.com/SDGP-CS75/NeuroSync-Website" target="_blank"
-          rel="noopener noreferrer">GitHub</a>
-      </nav>
-      <p>© 2026 NeuroSync. Not medical care.</p>
+    <div class="container">
+      <a class="footer-wordmark" href="#top">NeuroSync</a>
+      <div class="footer-row">
+        <p>A calm, student-built focus companion for ADHD minds.</p>
+        <nav aria-label="Footer">
+          <a href="./support.html">Support</a>
+          <a href="./privacy.html">Privacy</a>
+          <a href="./terms.html">Terms</a>
+          <a href="https://github.com/SDGP-CS75/NeuroSync-Website" target="_blank"
+            rel="noopener noreferrer">GitHub</a>
+        </nav>
+        <p>&copy; <span data-current-year>2026</span> NeuroSync. Not medical care.</p>
+      </div>
     </div>
   </footer>
-
-  <script src="./app.js"></script>
 </body>
 
 </html>

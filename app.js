@@ -1,51 +1,9 @@
-const revealElements = document.querySelectorAll(".reveal");
-const storySection = document.querySelector(".story");
-const storySteps = [...document.querySelectorAll(".story-step")];
-const storyScreens = [...document.querySelectorAll(".screen-state")];
-const heroPhone = document.querySelector(".hero-phone");
-const storyPhone = document.querySelector(".story-device");
-const heroUi = document.querySelector(".hero-ui");
-const phoneScenes = document.querySelectorAll("[data-phone-scene]");
-const downloadTargets = document.querySelectorAll("[data-download-link]");
-const downloadSize = document.querySelector("[data-download-size]");
-const downloadChannel = document.querySelector("[data-download-channel]");
-const downloadListed = document.querySelector("[data-download-listed]");
-const downloadAvailability = document.querySelector("[data-download-availability]");
-const deviceClock = document.getElementById("device-clock");
-
-const featureOrder = ["focus", "breakdown", "routine", "mood", "dashboard"];
-const motionState = {
-  currentScroll: window.scrollY,
-  targetScroll: window.scrollY,
-  lastScroll: window.scrollY,
-  ticking: false,
-};
-const heroMotion = {
-  scale: 0.84,
-  targetScale: 0.84,
-  rotateX: -8,
-  targetRotateX: -8,
-  rotateY: 12,
-  targetRotateY: 12,
-  twist: -6,
-  targetTwist: -6,
-  uiShiftX: 0,
-  targetUiShiftX: 0,
-  uiShiftY: 0,
-  targetUiShiftY: 0,
-};
-const storyMotion = {
-  scale: 0.88,
-  targetScale: 0.88,
-  rotateX: -5,
-  targetRotateX: -5,
-  rotateY: -10,
-  targetRotateY: -10,
-  twist: 4,
-  targetTwist: 4,
-};
+document.documentElement.classList.add("js");
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const desktopStory = window.matchMedia("(min-width: 901px)");
+
+const revealElements = [...document.querySelectorAll(".reveal")];
 
 if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
   const revealObserver = new IntersectionObserver(
@@ -57,201 +15,227 @@ if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
         }
       });
     },
-    { threshold: 0.2 }
+    { rootMargin: "0px 0px -8% 0px", threshold: 0.12 }
   );
 
   revealElements.forEach((element) => {
     element.classList.add("reveal-pending");
     revealObserver.observe(element);
   });
+} else {
+  revealElements.forEach((element) => element.classList.add("visible"));
 }
 
-function setStoryState(index) {
-  storySteps.forEach((step, stepIndex) => {
-    const isActive = stepIndex === index;
-    step.classList.toggle("active", isActive);
-    step.setAttribute("aria-hidden", String(!isActive));
-    step.toggleAttribute("inert", !isActive);
+function setupLiveStep() {
+  const liveStep = document.querySelector("[data-live-step]");
+  if (!liveStep) return;
+
+  const stepButtons = [...liveStep.querySelectorAll("[data-step-button]")];
+  const progressRoot = liveStep.querySelector("[data-progress-root]");
+  const progressBar = liveStep.querySelector("[data-progress-bar]");
+  const nextCopy = liveStep.querySelector("[data-next-copy]");
+  const resetButton = liveStep.querySelector("[data-reset-step]");
+
+  if (!stepButtons.length || !progressRoot || !progressBar || !nextCopy || !resetButton) {
+    return;
+  }
+
+  function getStepLabel(button) {
+    const copy = button.querySelector(".ui-step-copy");
+    return copy?.firstChild?.textContent?.trim().toLowerCase() || "the next step";
+  }
+
+  function updateLiveStep() {
+    const completed = stepButtons.filter(
+      (button) => button.getAttribute("aria-pressed") === "true"
+    ).length;
+    const nextButton = stepButtons.find(
+      (button) => button.getAttribute("aria-pressed") !== "true"
+    );
+
+    progressRoot.setAttribute("aria-valuenow", String(completed));
+    progressBar.style.width = `${(completed / stepButtons.length) * 100}%`;
+    resetButton.hidden = completed === 0;
+
+    if (completed === stepButtons.length) {
+      nextCopy.textContent = "All three steps complete. Take a breath.";
+      return;
+    }
+
+    nextCopy.textContent = nextButton
+      ? `Next: ${getStepLabel(nextButton)}.`
+      : "Next: take a short pause.";
+  }
+
+  stepButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const isPressed = button.getAttribute("aria-pressed") === "true";
+      button.setAttribute("aria-pressed", String(!isPressed));
+      updateLiveStep();
+    });
   });
 
-  storyScreens.forEach((screen, screenIndex) => {
-    const isVisible = screenIndex === index;
-    screen.classList.toggle("is-visible", isVisible);
-    screen.setAttribute("aria-hidden", String(!isVisible));
+  resetButton.addEventListener("click", () => {
+    stepButtons.forEach((button) => button.setAttribute("aria-pressed", "false"));
+    updateLiveStep();
   });
+
+  updateLiveStep();
 }
 
-function updateStoryProgress() {
-  if (!storySection) return;
+function setupStory() {
+  const storySection = document.querySelector(".experience");
+  const storySteps = [...document.querySelectorAll(".story-step")];
+  const storyScreens = [...document.querySelectorAll(".screen-state")];
 
-  const storyTop = storySection.offsetTop;
-  const viewportHeight = window.innerHeight;
-  const total = Math.max(storySection.offsetHeight - viewportHeight, 1);
-  const progress = Math.min(Math.max((motionState.currentScroll - storyTop) / total, 0), 1);
-  const index = Math.min(featureOrder.length - 1, Math.floor(progress * featureOrder.length));
+  if (!storySection || !storySteps.length || !storyScreens.length) return;
 
-  setStoryState(index);
+  let ticking = false;
+  let currentIndex = -1;
 
-  const scale = 0.86 + progress * 0.08;
-  const rotateY = -10 + progress * 18;
-  const rotateX = -5 + progress * 8;
-  const twist = 4 - progress * 8;
+  function isPinnedStory() {
+    return desktopStory.matches && !prefersReducedMotion.matches;
+  }
 
-  storyMotion.targetScale = scale;
-  storyMotion.targetRotateY = rotateY;
-  storyMotion.targetRotateX = rotateX;
-  storyMotion.targetTwist = twist;
-}
+  function setStoryState(index) {
+    const pinned = isPinnedStory();
 
-function updateHeroPhone() {
-  const hero = document.getElementById("hero");
-  if (!hero || !heroPhone) return;
+    storySteps.forEach((step, stepIndex) => {
+      const isActive = !pinned || stepIndex === index;
+      step.classList.toggle("active", isActive);
+      step.setAttribute("aria-hidden", String(!isActive));
+      step.toggleAttribute("inert", !isActive);
+    });
 
-  const viewportHeight = window.innerHeight;
-  const heroTop = hero.offsetTop;
-  const relativeTop = heroTop - motionState.currentScroll;
-  const progress = Math.min(Math.max(1 - relativeTop / viewportHeight, 0), 1.25);
-  const scale = 0.76 + Math.min(progress, 1) * 0.18;
-  const rotateY = 12 - Math.min(progress, 1) * 16;
-  const rotateX = -8 + Math.min(progress, 1) * 10;
-  const twist = -6 + Math.min(progress, 1) * 5;
+    storyScreens.forEach((screen, screenIndex) => {
+      const isVisible = !pinned || screenIndex === index;
+      screen.classList.toggle("is-visible", isVisible);
+      screen.setAttribute("aria-hidden", String(!isVisible));
+    });
+  }
 
-  heroMotion.targetScale = scale;
-  heroMotion.targetRotateY = rotateY;
-  heroMotion.targetRotateX = rotateX;
-  heroMotion.targetTwist = twist;
-}
+  function updateStoryProgress() {
+    if (!isPinnedStory()) {
+      if (currentIndex !== -2) {
+        currentIndex = -2;
+        setStoryState(0);
+      }
+      return;
+    }
 
-function applyScrollDirectionTilt() {
-  const delta = motionState.currentScroll - motionState.lastScroll;
-  const directionTilt = Math.max(Math.min(delta * 0.035, 1.8), -1.8);
+    const sectionTop = storySection.offsetTop;
+    const travel = Math.max(storySection.offsetHeight - window.innerHeight * 0.45, 1);
+    const progress = Math.min(
+      Math.max((window.scrollY - sectionTop + window.innerHeight * 0.2) / travel, 0),
+      0.999
+    );
+    const index = Math.min(
+      storySteps.length - 1,
+      Math.floor(progress * storySteps.length)
+    );
 
-  heroMotion.targetRotateX += -directionTilt * 0.7;
-  storyMotion.targetRotateX += -directionTilt * 0.45;
-
-  motionState.lastScroll = motionState.currentScroll;
-}
-
-function lerp(current, target, ease) {
-  return current + (target - current) * ease;
-}
-
-function renderPhoneMotion() {
-  if (heroPhone) {
-    heroMotion.scale = lerp(heroMotion.scale, heroMotion.targetScale, 0.12);
-    heroMotion.rotateX = lerp(heroMotion.rotateX, heroMotion.targetRotateX, 0.14);
-    heroMotion.rotateY = lerp(heroMotion.rotateY, heroMotion.targetRotateY, 0.12);
-    heroMotion.twist = lerp(heroMotion.twist, heroMotion.targetTwist, 0.1);
-
-    heroPhone.style.setProperty("--hero-scale", heroMotion.scale.toFixed(3));
-    heroPhone.style.setProperty("--tilt-x", heroMotion.rotateX.toFixed(3));
-    heroPhone.style.setProperty("--tilt-y", heroMotion.rotateY.toFixed(3));
-    heroPhone.style.setProperty("--twist", heroMotion.twist.toFixed(3));
-
-    if (heroUi) {
-      heroMotion.uiShiftX = lerp(heroMotion.uiShiftX, heroMotion.targetUiShiftX, 0.12);
-      heroMotion.uiShiftY = lerp(heroMotion.uiShiftY, heroMotion.targetUiShiftY, 0.12);
-      heroUi.style.setProperty("--ui-shift-x", `${heroMotion.uiShiftX.toFixed(2)}px`);
-      heroUi.style.setProperty("--ui-shift-y", `${heroMotion.uiShiftY.toFixed(2)}px`);
+    if (index !== currentIndex) {
+      currentIndex = index;
+      setStoryState(index);
     }
   }
 
-  if (storyPhone) {
-    storyMotion.scale = lerp(storyMotion.scale, storyMotion.targetScale, 0.12);
-    storyMotion.rotateX = lerp(storyMotion.rotateX, storyMotion.targetRotateX, 0.14);
-    storyMotion.rotateY = lerp(storyMotion.rotateY, storyMotion.targetRotateY, 0.12);
-    storyMotion.twist = lerp(storyMotion.twist, storyMotion.targetTwist, 0.1);
-
-    storyPhone.style.setProperty("--story-scale", storyMotion.scale.toFixed(3));
-    storyPhone.style.setProperty("--story-tilt-x", storyMotion.rotateX.toFixed(3));
-    storyPhone.style.setProperty("--story-tilt-y", storyMotion.rotateY.toFixed(3));
-    storyPhone.style.setProperty("--story-twist", storyMotion.twist.toFixed(3));
+  function requestStoryUpdate() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(() => {
+      updateStoryProgress();
+      ticking = false;
+    });
   }
+
+  window.addEventListener("scroll", requestStoryUpdate, { passive: true });
+  window.addEventListener("resize", requestStoryUpdate);
+  desktopStory.addEventListener("change", requestStoryUpdate);
+  prefersReducedMotion.addEventListener("change", requestStoryUpdate);
+
+  setStoryState(0);
+  requestStoryUpdate();
 }
 
-function handlePointerTilt(scene) {
-  const phone = scene.querySelector("[data-phone]");
-  if (!phone) return;
+function setupMobileMenu() {
+  const toggle = document.getElementById("mobileMenuToggle");
+  const mobileNav = document.getElementById("mobileNav");
+  if (!toggle || !mobileNav) return;
 
-  scene.addEventListener("mousemove", (event) => {
-    const rect = scene.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
+  const links = [...mobileNav.querySelectorAll("a")];
 
-    if (phone.classList.contains("hero-phone")) {
-      heroMotion.targetRotateY = x * 20;
-      heroMotion.targetRotateX = -y * 13;
-      heroMotion.targetTwist = x * 4;
-      heroMotion.targetUiShiftX = x * 18;
-      heroMotion.targetUiShiftY = y * 18;
-    } else {
-      storyMotion.targetRotateY = x * 12;
-      storyMotion.targetRotateX = -y * 8;
+  function setMenu(open, returnFocus = false) {
+    toggle.classList.toggle("active", open);
+    mobileNav.classList.toggle("active", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    mobileNav.setAttribute("aria-hidden", String(!open));
+
+    if (returnFocus) toggle.focus();
+  }
+
+  toggle.addEventListener("click", () => {
+    setMenu(!mobileNav.classList.contains("active"));
+  });
+
+  links.forEach((link) => {
+    link.addEventListener("click", () => setMenu(false));
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".site-header")) {
+      setMenu(false);
     }
   });
 
-  scene.addEventListener("mouseleave", () => {
-    if (phone.classList.contains("hero-phone")) {
-      heroMotion.targetUiShiftX = 0;
-      heroMotion.targetUiShiftY = 0;
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && mobileNav.classList.contains("active")) {
+      setMenu(false, true);
     }
-    updateHeroPhone();
-    updateStoryProgress();
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900) {
+      setMenu(false);
+    }
   });
 }
 
-phoneScenes.forEach(handlePointerTilt);
+function setupClock() {
+  const clock = document.getElementById("device-clock");
+  if (!clock) return;
 
-function updateClock() {
-  const now = new Date();
-  deviceClock.textContent = now.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-}
-
-function handleScroll() {
-  motionState.targetScroll = window.scrollY;
-  if (!motionState.ticking) {
-    motionState.ticking = true;
-    requestAnimationFrame(animateScroll);
+  function updateClock() {
+    const now = new Date();
+    clock.textContent = new Intl.DateTimeFormat([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(now);
+    clock.dateTime = now.toISOString();
   }
+
+  updateClock();
+  window.setInterval(updateClock, 60_000);
 }
 
-function animateScroll() {
-  const distance = motionState.targetScroll - motionState.currentScroll;
-  motionState.currentScroll += distance * 0.12;
+function setupDownloadMetadata() {
+  const downloadTargets = [...document.querySelectorAll("[data-download-link]")];
+  const downloadSizes = [...document.querySelectorAll("[data-download-size]")];
+  const downloadChannel = document.querySelector("[data-download-channel]");
+  const downloadListed = document.querySelector("[data-download-listed]");
+  const downloadAvailability = document.querySelector("[data-download-availability]");
 
-  updateHeroPhone();
-  updateStoryProgress();
-  applyScrollDirectionTilt();
-  renderPhoneMotion();
-
-  if (Math.abs(distance) > 0.2) {
-    requestAnimationFrame(animateScroll);
-  } else {
-    motionState.currentScroll = motionState.targetScroll;
-    updateHeroPhone();
-    updateStoryProgress();
-    renderPhoneMotion();
-    motionState.ticking = false;
-  }
-}
-
-window.addEventListener("scroll", handleScroll, { passive: true });
-window.addEventListener("resize", () => {
-  motionState.targetScroll = window.scrollY;
-  motionState.currentScroll = window.scrollY;
-  handleScroll();
-});
-
-async function loadApkUrl() {
   if (!downloadTargets.length) return;
 
-  const apkJsonPaths = ["./public/apk.json", "./apk.json"];
+  const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
-  const setDownloadTargets = (data) => {
+  function applyMetadata(data) {
     if (!data.apkUrl) return false;
 
     downloadTargets.forEach((target) => {
@@ -264,99 +248,79 @@ async function loadApkUrl() {
       downloadChannel.textContent = data.channel;
     }
 
-    if (downloadSize && Number.isFinite(data.sizeBytes)) {
-      downloadSize.textContent = `${(data.sizeBytes / 1024 / 1024).toFixed(1)} MB`;
+    if (Number.isFinite(data.sizeBytes)) {
+      const size = `${(data.sizeBytes / 1024 / 1024).toFixed(1)} MB`;
+      downloadSizes.forEach((element) => {
+        element.textContent = size;
+      });
     }
 
     if (downloadListed && data.listedAt) {
-      downloadListed.textContent = new Intl.DateTimeFormat("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }).format(new Date(data.listedAt));
+      downloadListed.textContent = dateFormatter.format(new Date(data.listedAt));
     }
 
     if (downloadAvailability && data.expiresAt) {
       const expiresAt = new Date(data.expiresAt);
-      const isExpired = Date.now() > expiresAt.getTime();
-      downloadAvailability.textContent = isExpired
-        ? "This hosted build may have expired. Download it if it is still available, or request a fresh build in the issue tracker."
-        : `This Expo-hosted beta build is listed until ${new Intl.DateTimeFormat("en-GB", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }).format(expiresAt)}.`;
+      downloadAvailability.textContent =
+        Date.now() > expiresAt.getTime()
+          ? "This hosted build may have expired. Download it if it is still available, or request a fresh build in the issue tracker."
+          : `This Expo-hosted beta build is listed until ${dateFormatter.format(expiresAt)}.`;
     }
 
     return true;
-  };
+  }
 
-  for (const path of apkJsonPaths) {
-    try {
-      const response = await fetch(path, { cache: "no-store" });
-      if (!response.ok) continue;
-
-      const data = await response.json();
-      if (setDownloadTargets(data)) return;
-    } catch (error) {
-      // Try the next possible JSON path.
+  async function loadMetadata() {
+    for (const path of ["./public/apk.json", "./apk.json"]) {
+      try {
+        const response = await fetch(path, { cache: "no-store" });
+        if (!response.ok) continue;
+        const data = await response.json();
+        if (applyMetadata(data)) return;
+      } catch {
+        // The direct APK links remain usable if metadata cannot be loaded.
+      }
     }
   }
+
+  loadMetadata();
 }
 
-// Mobile menu toggle functionality
-const mobileMenuToggle = document.getElementById("mobileMenuToggle");
-const mobileNav = document.getElementById("mobileNav");
-const mobileNavLinks = mobileNav.querySelectorAll("a");
-
-function closeMobileMenu() {
-  mobileMenuToggle.classList.remove("active");
-  mobileNav.classList.remove("active");
-  mobileMenuToggle.setAttribute("aria-expanded", "false");
-  mobileMenuToggle.setAttribute("aria-label", "Open menu");
-  mobileNav.setAttribute("aria-hidden", "true");
+function setupCurrentYear() {
+  document.querySelectorAll("[data-current-year]").forEach((element) => {
+    element.textContent = String(new Date().getFullYear());
+  });
 }
 
-mobileMenuToggle.addEventListener("click", () => {
-  const willOpen = !mobileNav.classList.contains("active");
-  mobileMenuToggle.classList.toggle("active", willOpen);
-  mobileNav.classList.toggle("active", willOpen);
-  mobileMenuToggle.setAttribute("aria-expanded", String(willOpen));
-  mobileMenuToggle.setAttribute("aria-label", willOpen ? "Close menu" : "Open menu");
-  mobileNav.setAttribute("aria-hidden", String(!willOpen));
-});
+function restoreDeepLink() {
+  if (!window.location.hash) return;
 
-// Close mobile menu when a link is clicked
-mobileNavLinks.forEach((link) => {
-  link.addEventListener("click", closeMobileMenu);
-});
-
-// Close mobile menu when clicking outside
-document.addEventListener("click", (event) => {
-  if (
-    !event.target.closest(".site-header") &&
-    mobileNav.classList.contains("active")
-  ) {
-    closeMobileMenu();
+  let targetId;
+  try {
+    targetId = decodeURIComponent(window.location.hash.slice(1));
+  } catch {
+    return;
   }
-});
 
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && mobileNav.classList.contains("active")) {
-    closeMobileMenu();
-    mobileMenuToggle.focus();
-  }
-});
+  const target = document.getElementById(targetId);
+  if (!target) return;
 
-// Close mobile menu on window resize
-window.addEventListener("resize", () => {
-  if (window.innerWidth > 768) {
-    closeMobileMenu();
-  }
-});
+  const root = document.documentElement;
+  const previousScrollBehavior = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  target.scrollIntoView({ block: "start" });
+  root.style.scrollBehavior = previousScrollBehavior;
+}
 
-updateClock();
-loadApkUrl();
-setInterval(updateClock, 30000);
-setStoryState(0);
-handleScroll();
+setupLiveStep();
+setupStory();
+setupMobileMenu();
+setupClock();
+setupDownloadMetadata();
+setupCurrentYear();
+
+if (document.readyState === "complete") {
+  restoreDeepLink();
+} else {
+  window.addEventListener("load", restoreDeepLink, { once: true });
+}
