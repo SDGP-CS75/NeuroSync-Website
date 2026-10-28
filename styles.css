@@ -26,6 +26,10 @@ html {
   scroll-behavior: smooth;
 }
 
+section[id] {
+  scroll-margin-top: 120px;
+}
+
 body {
   margin: 0;
   font-family: "Lexend", "Segoe UI", sans-serif;
@@ -50,6 +54,29 @@ body::before {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+:focus-visible {
+  outline: 3px solid #3c4cc9;
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 100;
+  padding: 12px 18px;
+  border-radius: 8px;
+  color: #fff;
+  background: #28304a;
+  font-weight: 700;
+  transform: translateY(-160%);
+  transition: transform 180ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
 }
 
 button,
@@ -1043,32 +1070,15 @@ input {
   line-height: 1.65;
 }
 
-.reveal {
+.reveal-pending {
   opacity: 0;
   transform: translateY(26px);
   transition: opacity 720ms ease, transform 720ms ease;
 }
 
-.reveal.visible {
+.reveal-pending.visible {
   opacity: 1;
   transform: translateY(0);
-}
-
-.split-char {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(26px);
-  transition: opacity 520ms ease, transform 520ms ease;
-}
-
-.split-text.is-visible .split-char {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.split-space {
-  display: inline-block;
-  width: 0.34em;
 }
 
 @keyframes spin {
@@ -1120,6 +1130,25 @@ input {
 @keyframes progressSweep {
   0%, 100% { transform: translateX(-120%); }
   55% { transform: translateX(140%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal-pending {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (max-width: 1080px) {

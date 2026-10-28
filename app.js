@@ -1,5 +1,4 @@
 const revealElements = document.querySelectorAll(".reveal");
-const splitTargets = document.querySelectorAll(".split-text");
 const storySection = document.querySelector(".story");
 const storySteps = [...document.querySelectorAll(".story-step")];
 const storyScreens = [...document.querySelectorAll(".screen-state")];
@@ -46,71 +45,39 @@ const storyMotion = {
   targetTwist: 4,
 };
 
-if ("scrollRestoration" in history) {
-  history.scrollRestoration = "manual";
-}
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-function splitText(target) {
-  const text = target.textContent.trim();
-  target.textContent = "";
+if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.2 }
+  );
 
-  let globalIndex = 0;
-  const words = text.split(" ");
-
-  words.forEach((word, wordIndex) => {
-    const wordSpan = document.createElement("span");
-    wordSpan.className = "split-word";
-    wordSpan.style.display = "inline-block";
-    wordSpan.style.whiteSpace = "nowrap";
-
-    [...word].forEach((char) => {
-      const charSpan = document.createElement("span");
-      charSpan.className = "split-char";
-      charSpan.textContent = char;
-      charSpan.style.transitionDelay = `${globalIndex * 22}ms`;
-      wordSpan.appendChild(charSpan);
-      globalIndex++;
-    });
-
-    target.appendChild(wordSpan);
-
-    if (wordIndex < words.length - 1) {
-      const spaceSpan = document.createElement("span");
-      spaceSpan.className = "split-space";
-      spaceSpan.textContent = " ";
-      target.appendChild(spaceSpan);
-      globalIndex++;
-    }
+  revealElements.forEach((element) => {
+    element.classList.add("reveal-pending");
+    revealObserver.observe(element);
   });
 }
-
-splitTargets.forEach(splitText);
-
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-
-        if (entry.target.classList.contains("split-text")) {
-          entry.target.classList.add("is-visible");
-        }
-      }
-    });
-  },
-  { threshold: 0.2 }
-);
-
-revealElements.forEach((element) => revealObserver.observe(element));
-splitTargets.forEach((element) => revealObserver.observe(element));
 
 function setStoryState(index) {
   storySteps.forEach((step, stepIndex) => {
-    step.classList.toggle("active", stepIndex === index);
+    const isActive = stepIndex === index;
+    step.classList.toggle("active", isActive);
+    step.setAttribute("aria-hidden", String(!isActive));
+    step.toggleAttribute("inert", !isActive);
   });
 
   storyScreens.forEach((screen, screenIndex) => {
-    screen.classList.toggle("is-visible", screenIndex === index);
+    const isVisible = screenIndex === index;
+    screen.classList.toggle("is-visible", isVisible);
+    screen.setAttribute("aria-hidden", String(!isVisible));
   });
 }
 
@@ -346,15 +313,17 @@ function closeMobileMenu() {
   mobileMenuToggle.classList.remove("active");
   mobileNav.classList.remove("active");
   mobileMenuToggle.setAttribute("aria-expanded", "false");
+  mobileMenuToggle.setAttribute("aria-label", "Open menu");
+  mobileNav.setAttribute("aria-hidden", "true");
 }
 
 mobileMenuToggle.addEventListener("click", () => {
-  mobileMenuToggle.classList.toggle("active");
-  mobileNav.classList.toggle("active");
-  mobileMenuToggle.setAttribute(
-    "aria-expanded",
-    mobileMenuToggle.classList.contains("active")
-  );
+  const willOpen = !mobileNav.classList.contains("active");
+  mobileMenuToggle.classList.toggle("active", willOpen);
+  mobileNav.classList.toggle("active", willOpen);
+  mobileMenuToggle.setAttribute("aria-expanded", String(willOpen));
+  mobileMenuToggle.setAttribute("aria-label", willOpen ? "Close menu" : "Open menu");
+  mobileNav.setAttribute("aria-hidden", String(!willOpen));
 });
 
 // Close mobile menu when a link is clicked
@@ -372,6 +341,13 @@ document.addEventListener("click", (event) => {
   }
 });
 
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && mobileNav.classList.contains("active")) {
+    closeMobileMenu();
+    mobileMenuToggle.focus();
+  }
+});
+
 // Close mobile menu on window resize
 window.addEventListener("resize", () => {
   if (window.innerWidth > 768) {
@@ -383,8 +359,4 @@ updateClock();
 loadApkUrl();
 setInterval(updateClock, 30000);
 setStoryState(0);
-window.scrollTo(0, 0);
-motionState.currentScroll = 0;
-motionState.targetScroll = 0;
-motionState.lastScroll = 0;
 handleScroll();

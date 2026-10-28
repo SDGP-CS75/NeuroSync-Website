@@ -16,9 +16,11 @@
 </head>
 
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
   <!-- App Intro Section: Nymo Landing -->
   <!-- Note: Server-side includes are not supported on Vercel. If you need app-intro.html content, include it directly here. -->
-  <div class="page-background">
+  <div class="page-background" aria-hidden="true">
     <div class="glow glow-lilac"></div>
     <div class="glow glow-blue"></div>
     <div class="glow glow-mint"></div>
@@ -28,7 +30,7 @@
   <header class="site-header">
     <a class="brand" href="#hero" aria-label="NeuroSync home">
       <span class="brand-mark">
-        <img src="./logo.png" alt="NeuroSync logo" />
+        <img src="./logo.png" alt="" />
       </span>
       <span class="brand-copy">
         <strong>NeuroSync</strong>
@@ -36,7 +38,7 @@
       </span>
     </a>
 
-    <nav class="site-nav">
+    <nav class="site-nav" aria-label="Primary">
       <a href="#problem">Why it helps</a>
       <a href="#story">Experience</a>
       <a href="#difference">Difference</a>
@@ -47,13 +49,14 @@
       href="https://expo.dev/artifacts/eas/3jARIbq9RrdMgJStc5RsCBGdno4EKdqDivD_13REIvk.apk"
       target="_blank" rel="noopener noreferrer">Download</a>
 
-    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open menu" aria-expanded="false"
+      aria-controls="mobileNav">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
     </button>
 
-    <nav class="mobile-nav" id="mobileNav">
+    <nav class="mobile-nav" id="mobileNav" aria-label="Mobile">
       <a href="#problem">Why it helps</a>
       <a href="#story">Experience</a>
       <a href="#difference">Difference</a>
@@ -64,11 +67,11 @@
     </nav>
   </header>
 
-  <main>
+  <main id="main-content" tabindex="-1">
     <section class="hero section-shell" id="hero">
       <div class="hero-copy reveal">
         <p class="eyebrow">Calm productivity for ADHD minds</p>
-        <h1 class="headline split-text">Focus Without Pressure</h1>
+        <h1 class="headline">Focus Without Pressure</h1>
         <p class="lead">
           A calm productivity system designed for ADHD minds. Gentle structure,
           emotion-aware guidance, and one clear next step at a time.
@@ -114,7 +117,7 @@
     <section class="problem section-shell" id="problem">
       <div class="section-copy reveal">
         <p class="eyebrow">When productivity feels heavy</p>
-        <h2 class="section-title split-text">Some days, the hardest part is beginning.</h2>
+        <h2 class="section-title">Some days, the hardest part is beginning.</h2>
         <p class="section-lead">
           NeuroSync was designed for moments that feel noisy, stuck, or emotionally
           loaded, not just the days when everything is already going well.
@@ -145,43 +148,43 @@
         <div class="story-copy">
           <article class="story-step active" data-step="focus">
             <p class="eyebrow">Focus Mode</p>
-            <h2 class="section-title split-text">A softer way into attention.</h2>
+            <h2 class="section-title">A softer way into attention.</h2>
             <p>
               Calming soundscapes, a distraction-light interface, and one timer that
               helps you settle in without feeling watched.
             </p>
           </article>
 
-          <article class="story-step" data-step="breakdown">
+          <article class="story-step" data-step="breakdown" aria-hidden="true">
             <p class="eyebrow">AI Task Breakdown</p>
-            <h2 class="section-title split-text">When a task feels too big, we make it smaller.</h2>
+            <h2 class="section-title">When a task feels too big, we make it smaller.</h2>
             <p>
               NeuroSync gently breaks overwhelming work into clear, doable steps so
               getting started feels safer.
             </p>
           </article>
 
-          <article class="story-step" data-step="routine">
+          <article class="story-step" data-step="routine" aria-hidden="true">
             <p class="eyebrow">Adaptive Routine Builder</p>
-            <h2 class="section-title split-text">Structure that bends with real life.</h2>
+            <h2 class="section-title">Structure that bends with real life.</h2>
             <p>
               Flexible scheduling, smart reminders, and routines that support
               consistency without becoming rigid.
             </p>
           </article>
 
-          <article class="story-step" data-step="mood">
+          <article class="story-step" data-step="mood" aria-hidden="true">
             <p class="eyebrow">Mood Tracking</p>
-            <h2 class="section-title split-text">Your emotions belong in the system too.</h2>
+            <h2 class="section-title">Your emotions belong in the system too.</h2>
             <p>
               Track how you feel, notice patterns, and build self-awareness without
               judgment or performance pressure.
             </p>
           </article>
 
-          <article class="story-step" data-step="dashboard">
+          <article class="story-step" data-step="dashboard" aria-hidden="true">
             <p class="eyebrow">Minimal Dashboard</p>
-            <h2 class="section-title split-text">Everything important. Nothing noisy.</h2>
+            <h2 class="section-title">Everything important. Nothing noisy.</h2>
             <p>
               A clean home base for tasks, mood, routines, and recovery, designed to
               reduce cognitive load from the first glance.
@@ -206,19 +209,23 @@
                   <img src="./story-screen.png" alt="Your Calm Focus Companion" class="story-screen-img" />
                 </div>
 
-                <div class="screen-state" data-screen="breakdown" style="padding:0; overflow:hidden;">
+                <div class="screen-state" data-screen="breakdown" aria-hidden="true"
+                  style="padding:0; overflow:hidden;">
                   <img src="./story-screen-2.png" alt="AI Task Breakdown" class="story-screen-img" />
                 </div>
 
-                <div class="screen-state" data-screen="routine" style="padding:0; overflow:hidden;">
+                <div class="screen-state" data-screen="routine" aria-hidden="true"
+                  style="padding:0; overflow:hidden;">
                   <img src="./story-screen-3.png" alt="Reach your full potential" class="story-screen-img" />
                 </div>
 
-                <div class="screen-state" data-screen="mood" style="padding:0; overflow:hidden;">
+                <div class="screen-state" data-screen="mood" aria-hidden="true"
+                  style="padding:0; overflow:hidden;">
                   <img src="./story-screen-4.png" alt="Mood Journal" class="story-screen-img" />
                 </div>
 
-                <div class="screen-state" data-screen="dashboard" style="padding:0; overflow:hidden;">
+                <div class="screen-state" data-screen="dashboard" aria-hidden="true"
+                  style="padding:0; overflow:hidden;">
                   <img src="./story-screen-5.png" alt="Dashboard" class="story-screen-img" />
                 </div>
               </div>
@@ -231,7 +238,7 @@
     <section class="emotion section-shell" id="emotion">
       <div class="emotion-card reveal">
         <p class="eyebrow">Guilt-free recovery</p>
-        <h2 class="section-title split-text">No guilt. No pressure. Just progress.</h2>
+        <h2 class="section-title">No guilt. No pressure. Just progress.</h2>
         <p>
           Missed a routine? Lost momentum? NeuroSync helps you restart kindly,
           without streak anxiety, punishment, or shame.
@@ -242,7 +249,7 @@
     <section class="difference section-shell" id="difference">
       <div class="section-copy reveal">
         <p class="eyebrow">How it’s different</p>
-        <h2 class="section-title split-text">Built for support, not pressure.</h2>
+        <h2 class="section-title">Built for support, not pressure.</h2>
       </div>
 
       <div class="difference-grid">
@@ -272,7 +279,7 @@
     <section class="team section-shell" id="team">
       <div class="section-copy reveal">
         <p class="eyebrow">The people behind NeuroSync</p>
-        <h2 class="section-title split-text">Meet the team.</h2>
+        <h2 class="section-title">Meet the team.</h2>
         <p class="section-lead">A passionate group of designers and developers building calm, caring technology for ADHD
           minds.</p>
       </div>
@@ -344,7 +351,7 @@
       <div class="cta-card download-panel reveal">
         <div class="download-copy">
           <p class="eyebrow">Android beta</p>
-          <h2 class="section-title split-text">Take NeuroSync with you.</h2>
+          <h2 class="section-title">Take NeuroSync with you.</h2>
           <p>
             Download the current Android beta directly. Because this is an APK,
             Android will ask you to allow installs from your browser before the
