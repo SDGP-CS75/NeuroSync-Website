@@ -63,21 +63,22 @@ The obsolete `X-XSS-Protection` header is intentionally not used.
 
 ## Beta APK release procedure
 
-The current APK is an Expo EAS temporary artifact. Expo artifact links expire,
-so the project includes both a visible expiry notice and an automated monitor.
+The Android beta APK is hosted as a GitHub Release asset on
+`SDGP-CS75/NeuroSync-Website`, with an automated daily monitor verifying
+availability and byte size.
 
 1. Build and sign the Android APK.
-2. Publish it to a durable HTTPS location controlled by the project, preferably
-   a GitHub Release asset.
+2. Publish it as a GitHub Release asset on `SDGP-CS75/NeuroSync-Website`.
 3. Update `public/apk.json`:
 
    ```json
    {
      "channel": "Android beta",
      "hosting": "GitHub Releases",
-     "apkUrl": "https://github.com/ORG/REPO/releases/download/TAG/neurosync.apk",
-     "sizeBytes": 93131705,
-     "listedAt": "2026-10-28T07:33:41Z",
+     "apkUrl": "https://github.com/SDGP-CS75/NeuroSync-Website/releases/download/v1.0.0-beta.1/neurosync-android-beta.apk",
+     "sizeBytes": 93131793,
+     "sha256": "f89500e445a14f1036b0686deb8aee8887605b121acccebc499b67e2bb116e57",
+     "listedAt": "2026-11-11T15:10:00Z",
      "feedbackUrl": "https://github.com/SDGP-CS75/NeuroSync-Website/issues/new?title=NeuroSync%20beta%20feedback"
    }
    ```
@@ -133,11 +134,9 @@ files.
 
 ### The beta download fails
 
-Run `npm run check:download`. If the Expo artifact expired, publish a new APK,
-update `public/apk.json` and the support page, then repeat the release
-procedure. For the current 11 November 2026 deadline, move the APK to a GitHub
-Release asset or another durable HTTPS host instead of rebuilding only another
-temporary EAS artifact. Never point users to an unverified mirror.
+Run `npm run check:download`. Confirm the GitHub Release asset exists, matches
+the `sizeBytes` and `sha256` recorded in `public/apk.json`, and is publicly
+reachable. Never point users to an unverified mirror.
 
 ### Browser tests cannot find Chrome
 
