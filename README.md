@@ -90,10 +90,10 @@ publication dates, hosting label, optional checksum, and feedback link. The
 page fetches it at runtime and keeps its static download links synchronized
 through the automated checks.
 
-The current APK is an Expo EAS temporary artifact. It must be replaced before
-`expiresAt` or the monitor will fail. `expiresAt` is optional for durable
-hosting; omit it when the host does not expire the artifact. For a durable
-public beta:
+The current APK is published as a GitHub Release asset on
+`SDGP-CS75/NeuroSync-Website`. `expiresAt` is omitted for durable hosting;
+include it only when a host expires the artifact. To publish a refreshed beta
+build:
 
 1. Publish the signed APK as a GitHub Release asset or another stable,
    organization-controlled HTTPS host.
@@ -163,8 +163,8 @@ their browser interstitials and link behavior make installation unreliable.
 ## Privacy and performance
 
 The website does not add analytics, advertising scripts, account forms, or
-first-party cookies. The privacy notice documents Vercel, Expo, and GitHub
-processing that can occur when the site is used.
+first-party cookies. The privacy notice documents Vercel and GitHub processing
+that can occur when the site is used.
 
 Unversioned CSS and JavaScript revalidate instead of being cached immutably.
 Images and fonts use short-lived caching with stale-while-revalidate, and

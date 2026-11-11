@@ -324,7 +324,7 @@ function setupDownloadMetadata() {
             : `${hosting} lists this beta build until ${dateFormatter.format(expiresAt)}.`;
       } else {
         downloadAvailability.textContent =
-          `${hosting} hosts this build. No expiry date is listed in the site metadata; verify availability before sharing the link.`;
+          `${hosting} hosts this build as a direct Android APK. Report any download or installation issue through the feedback link above.`;
       }
     }
 
